@@ -19,8 +19,13 @@
                 misma sede). El rol debe ser uno de los de la tabla (Principal,
                 Asistente 1, Asistente 2, Cuarto o VAR) y un partido no puede tener
                 dos arbitros con el mismo rol.
- Depende de   : 50_SP_ABM_Arbitraje.sql y las tablas de Arbitraje de Avila
-                (04_Tablas_Arbitraje_Incidencia.sql)
+                Advertencia: a partir de dieciseisavos (cualquier fase distinta de
+                Grupos), si el pais del arbitro tiene una seleccion que sigue en
+                competencia (partido eliminatorio todavia sin finalizar), la
+                designacion se registra y el SP informa el aviso en @Advertencia,
+                porque ese arbitro podria tener que dirigir mas adelante a su propia
+                seleccion.
+ Depende de   : 50_SP_ABM_Arbitraje.sql y 04_Tablas_Arbitraje_Incidencia.sql
 ==============================================================================*/
 USE MundialDB;
 GO
@@ -29,7 +34,8 @@ CREATE OR ALTER PROCEDURE Arbitraje.usp_DesignarArbitro
     @IdPartido      INT,
     @IdArbitro      INT,
     @RolArbitral    VARCHAR(20),
-    @IdDesignacion  INT = NULL OUTPUT
+    @IdDesignacion  INT = NULL OUTPUT,
+    @Advertencia    VARCHAR(300) = NULL OUTPUT
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -39,13 +45,15 @@ BEGIN
     DECLARE @errores VARCHAR(2000) = '';
     DECLARE @rol VARCHAR(20) = LTRIM(RTRIM(@RolArbitral));
     DECLARE @partidoExiste BIT = 0, @arbitroExiste BIT = 0;
-    DECLARE @paisArbitro INT, @paisLocal INT, @paisVisitante INT, @fechaUtc DATETIME2;
+    DECLARE @paisArbitro INT, @paisLocal INT, @paisVisitante INT, @fechaUtc DATETIME2, @fase VARCHAR(20);
+
+    SET @Advertencia = NULL;
 
     SELECT @arbitroExiste = 1, @paisArbitro = IdPais
     FROM Arbitraje.Arbitro
     WHERE IdArbitro = @IdArbitro;
 
-    SELECT @partidoExiste = 1, @paisLocal = sl.IdPais, @paisVisitante = sv.IdPais, @fechaUtc = p.FechaHoraUtc
+    SELECT @partidoExiste = 1, @paisLocal = sl.IdPais, @paisVisitante = sv.IdPais, @fechaUtc = p.FechaHoraUtc, @fase = p.Fase
     FROM Torneo.Partido p
     LEFT JOIN Torneo.Seleccion sl ON sl.IdSeleccion = p.IdSeleccionLocal
     LEFT JOIN Torneo.Seleccion sv ON sv.IdSeleccion = p.IdSeleccionVisitante
@@ -106,7 +114,17 @@ BEGIN
         IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
         SET @IdDesignacion = NULL;
         THROW;
-    END CATCH
+    END CATCH;
+
+    -- Advertencia desde dieciseisavos: la seleccion del pais del arbitro sigue en competencia
+    IF @fase <> 'Grupos'
+       AND EXISTS (SELECT 1
+                   FROM Torneo.Seleccion s
+                   JOIN Torneo.Partido pc ON s.IdSeleccion IN (pc.IdSeleccionLocal, pc.IdSeleccionVisitante)
+                   WHERE s.IdPais = @paisArbitro
+                     AND pc.Fase <> 'Grupos'
+                     AND pc.Estado IN ('Programado', 'En juego', 'Suspendido'))
+        SET @Advertencia = 'Advertencia: la seleccion del pais del arbitro sigue en competencia y podria cruzarse con las que disputan este partido. ';
 END
 GO
 
