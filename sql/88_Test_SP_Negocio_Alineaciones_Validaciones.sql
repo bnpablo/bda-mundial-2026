@@ -31,11 +31,11 @@ DECLARE @IdP6 INT;
 DECLARE @Arg01 INT, @Arg05 INT, @Arg06 INT, @Arg07 INT, @Arg14 INT;
 DECLARE @jsonArg VARCHAR(MAX), @jsonMalo VARCHAR(MAX), @jsonBaja VARCHAR(MAX), @jsonOtra VARCHAR(MAX);
 
-SELECT @Arg01 = MAX(CASE WHEN CodigoExterno = 'ARG-01' THEN IdJugador END),
-       @Arg05 = MAX(CASE WHEN CodigoExterno = 'ARG-05' THEN IdJugador END),
-       @Arg06 = MAX(CASE WHEN CodigoExterno = 'ARG-06' THEN IdJugador END),
-       @Arg07 = MAX(CASE WHEN CodigoExterno = 'ARG-07' THEN IdJugador END),
-       @Arg14 = MAX(CASE WHEN CodigoExterno = 'ARG-14' THEN IdJugador END)
+SELECT @Arg01 = MAX(CASE WHEN CodigoExterno = 'ARG-01' THEN IdJugador ELSE 0 END),
+       @Arg05 = MAX(CASE WHEN CodigoExterno = 'ARG-05' THEN IdJugador ELSE 0 END),
+       @Arg06 = MAX(CASE WHEN CodigoExterno = 'ARG-06' THEN IdJugador ELSE 0 END),
+       @Arg07 = MAX(CASE WHEN CodigoExterno = 'ARG-07' THEN IdJugador ELSE 0 END),
+       @Arg14 = MAX(CASE WHEN CodigoExterno = 'ARG-14' THEN IdJugador ELSE 0 END)
 FROM Torneo.Jugador;
 
 -- Alineacion valida de Argentina (11 titulares en 4-3-3 y 6 suplentes) para las pruebas
@@ -164,7 +164,7 @@ PRINT '=== Prueba 9: cambio en un partido que no esta En juego y sin alineacione
 -- (el partido temporal esta Programado) y ninguno de los dos jugadores esta en la alineacion del partido.
 BEGIN TRY
     EXEC Formacion.usp_RegistrarCambio @IdPartido = @IdP6, @IdJugadorSale = @Arg07, @IdJugadorEntra = @Arg14,
-         @Periodo = 'SegundoTiempo', @Minuto = 60, @Motivo = 'Tactico';
+         @Periodo = 'Segundo tiempo', @Minuto = 60, @Motivo = 'Tactico';
 END TRY
 BEGIN CATCH
     SELECT ERROR_NUMBER() AS Numero, ERROR_MESSAGE() AS Mensaje;
@@ -175,7 +175,7 @@ PRINT '=== Prueba 10: cambio entre dos titulares ===';
 -- suplente (ARG-05 es titular).
 BEGIN TRY
     EXEC Formacion.usp_RegistrarCambio @IdPartido = @IdP5, @IdJugadorSale = @Arg06, @IdJugadorEntra = @Arg05,
-         @Periodo = 'SegundoTiempo', @Minuto = 70, @Motivo = 'Tactico';
+         @Periodo = 'Segundo tiempo', @Minuto = 70, @Motivo = 'Tactico';
 END TRY
 BEGIN CATCH
     SELECT ERROR_NUMBER() AS Numero, ERROR_MESSAGE() AS Mensaje;
@@ -186,7 +186,19 @@ PRINT '=== Prueba 11: reemplazar a un jugador que ya fue reemplazado ===';
 -- reemplazado (ARG-07 salio en el script 87).
 BEGIN TRY
     EXEC Formacion.usp_RegistrarCambio @IdPartido = @IdP5, @IdJugadorSale = @Arg07, @IdJugadorEntra = @Arg14,
-         @Periodo = 'SegundoTiempo', @Minuto = 80, @Motivo = 'Tactico';
+         @Periodo = 'Segundo tiempo', @Minuto = 80, @Motivo = 'Tactico';
+END TRY
+BEGIN CATCH
+    SELECT ERROR_NUMBER() AS Numero, ERROR_MESSAGE() AS Mensaje;
+END CATCH
+
+PRINT '=== Prueba 12: cambio con periodo y motivo fuera del dominio ===';
+-- Resultado esperado: error 50001 con 2 condiciones: el periodo debe ser Primer tiempo, Segundo tiempo,
+-- Alargue 1 o Alargue 2 ('Penales' no es valido) y el motivo debe ser Tactico, Lesion u Otro ('Cansancio' no es
+-- valido). Los jugadores (ARG-06 titular y ARG-14 suplente) y el partido 5 son validos.
+BEGIN TRY
+    EXEC Formacion.usp_RegistrarCambio @IdPartido = @IdP5, @IdJugadorSale = @Arg06, @IdJugadorEntra = @Arg14,
+         @Periodo = 'Penales', @Minuto = 90, @Motivo = 'Cansancio';
 END TRY
 BEGIN CATCH
     SELECT ERROR_NUMBER() AS Numero, ERROR_MESSAGE() AS Mensaje;
@@ -195,7 +207,7 @@ END CATCH
 /*------------------------------------------------------------------------------
  VERIFICAR ALINEACION
 ------------------------------------------------------------------------------*/
-PRINT '=== Prueba 12: verificar un partido inexistente ===';
+PRINT '=== Prueba 13: verificar un partido inexistente ===';
 -- Resultado esperado: error 50001: "El partido indicado no existe."
 BEGIN TRY
     EXEC Formacion.usp_VerificarAlineacion @IdPartido = 999;
@@ -204,7 +216,7 @@ BEGIN CATCH
     SELECT ERROR_NUMBER() AS Numero, ERROR_MESSAGE() AS Mensaje;
 END CATCH
 
-PRINT '=== Prueba 13: verificar un partido sin alineaciones ===';
+PRINT '=== Prueba 14: verificar un partido sin alineaciones ===';
 -- Resultado esperado: una fila por seleccion (Argentina y Brasil) con 0 titulares, 0 suplentes, 0 cambios y
 -- estado INCOMPLETA (el partido temporal todavia no tiene alineaciones).
 EXEC Formacion.usp_VerificarAlineacion @IdPartido = @IdP6;

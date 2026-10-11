@@ -16,9 +16,10 @@
                 las sedes MetLife y SoFi, que cargan los scripts 11, 21, 81 y 84.
  Supuestos    : Arbitraje.usp_Arbitro_Alta (50_SP_ABM_Arbitraje.sql) recibe @CodigoExterno,
                 @Nombre, @Apellido, @FechaNacimiento, @IdPais y @Categoria, y devuelve el
-                id en @IdArbitro OUTPUT. La categoria y los roles arbitrales se declaran al
-                principio (@categoriaDemo y @rol...): si 05_Tablas_Arbitraje.sql define
-                otros valores permitidos, se cambian ahi, en un solo lugar.
+                id en @IdArbitro OUTPUT. La categoria (FIFA o Confederacion) y los roles
+                (Principal, Asistente 1, Asistente 2, Cuarto y VAR) son los de los CHECK de
+                las tablas de Arbitraje de Avila (04_Tablas_Arbitraje_Incidencia.sql); un
+                partido no puede repetir un rol (UNIQUE IdPartido, RolArbitral).
 ==============================================================================*/
 USE MundialDB;
 GO
@@ -33,9 +34,9 @@ DECLARE @SelArg INT = (SELECT IdSeleccion FROM Torneo.Seleccion WHERE CodigoExte
 DECLARE @SelBra INT = (SELECT IdSeleccion FROM Torneo.Seleccion WHERE CodigoExterno = 'SEL-BRA');
 DECLARE @SelFra INT = (SELECT IdSeleccion FROM Torneo.Seleccion WHERE CodigoExterno = 'SEL-FRA');
 DECLARE @SelMex INT = (SELECT IdSeleccion FROM Torneo.Seleccion WHERE CodigoExterno = 'SEL-MEX');
-DECLARE @categoriaDemo VARCHAR(20) = 'Elite';
-DECLARE @rolCentral VARCHAR(20) = 'Central', @rolAsistente1 VARCHAR(20) = 'Asistente 1',
-        @rolAsistente2 VARCHAR(20) = 'Asistente 2', @rolCuarto VARCHAR(20) = 'Cuarto arbitro';
+DECLARE @categoriaDemo VARCHAR(20) = 'FIFA';
+DECLARE @rolPrincipal VARCHAR(20) = 'Principal', @rolAsistente1 VARCHAR(20) = 'Asistente 1',
+        @rolAsistente2 VARCHAR(20) = 'Asistente 2', @rolCuarto VARCHAR(20) = 'Cuarto';
 DECLARE @Arb1 INT, @Arb2 INT, @Arb3 INT, @Arb4 INT, @Arb5 INT, @Arb6 INT;
 DECLARE @IdPA INT, @IdPB INT, @IdPC INT;
 DECLARE @tmpElegibles TABLE (IdArbitro INT, Nombre VARCHAR(80), Apellido VARCHAR(80), IdPais INT, Categoria VARCHAR(20));
@@ -97,9 +98,9 @@ JOIN Torneo.Pais p       ON p.IdPais = e.IdPais
 WHERE a.CodigoExterno LIKE 'ARB-DES-%' ORDER BY a.CodigoExterno;
 
 PRINT '=== Prueba 4: designar el cuerpo arbitral de Francia contra Mexico ===';
--- Resultado esperado: se crean 4 designaciones en PARTIDO-931: ARB-DES-01 Central, ARB-DES-02 Asistente 1,
--- ARB-DES-03 Asistente 2 y ARB-DES-04 Cuarto arbitro.
-EXEC Arbitraje.usp_DesignarArbitro @IdPartido = @IdPA, @IdArbitro = @Arb1, @RolArbitral = @rolCentral;
+-- Resultado esperado: se crean 4 designaciones en PARTIDO-931: ARB-DES-01 Principal, ARB-DES-02 Asistente 1,
+-- ARB-DES-03 Asistente 2 y ARB-DES-04 Cuarto.
+EXEC Arbitraje.usp_DesignarArbitro @IdPartido = @IdPA, @IdArbitro = @Arb1, @RolArbitral = @rolPrincipal;
 EXEC Arbitraje.usp_DesignarArbitro @IdPartido = @IdPA, @IdArbitro = @Arb2, @RolArbitral = @rolAsistente1;
 EXEC Arbitraje.usp_DesignarArbitro @IdPartido = @IdPA, @IdArbitro = @Arb3, @RolArbitral = @rolAsistente2;
 EXEC Arbitraje.usp_DesignarArbitro @IdPartido = @IdPA, @IdArbitro = @Arb4, @RolArbitral = @rolCuarto;
@@ -120,9 +121,9 @@ JOIN Torneo.Pais p       ON p.IdPais = e.IdPais
 WHERE a.CodigoExterno LIKE 'ARB-DES-%' ORDER BY a.CodigoExterno;
 
 PRINT '=== Prueba 6: un arbitro de otra nacionalidad dirige Argentina contra Brasil ===';
--- Resultado esperado: ARB-DES-05 (mexicano) queda designado Central en PARTIDO-932. Despues de designarlo,
+-- Resultado esperado: ARB-DES-05 (mexicano) queda designado Principal en PARTIDO-932. Despues de designarlo,
 -- el unico arbitro de prueba elegible para ese partido es ARB-DES-06.
-EXEC Arbitraje.usp_DesignarArbitro @IdPartido = @IdPB, @IdArbitro = @Arb5, @RolArbitral = @rolCentral;
+EXEC Arbitraje.usp_DesignarArbitro @IdPartido = @IdPB, @IdArbitro = @Arb5, @RolArbitral = @rolPrincipal;
 SELECT d.IdDesignacion, a.CodigoExterno, d.RolArbitral
 FROM Arbitraje.DesignacionArbitral d
 JOIN Arbitraje.Arbitro a ON a.IdArbitro = d.IdArbitro
@@ -134,10 +135,10 @@ FROM @tmpElegibles e JOIN Arbitraje.Arbitro a ON a.IdArbitro = e.IdArbitro
 WHERE a.CodigoExterno LIKE 'ARB-DES-%' ORDER BY a.CodigoExterno;
 
 PRINT '=== Prueba 7: el mismo arbitro dirige un partido posterior ===';
--- Resultado esperado: ARB-DES-01 (que dirigio PARTIDO-931) queda designado Central en PARTIDO-933 (Argentina
+-- Resultado esperado: ARB-DES-01 (que dirigio PARTIDO-931) queda designado Principal en PARTIDO-933 (Argentina
 -- contra Francia), 4 dias despues. Los elegibles de ese partido son ARB-DES-02, 03, 04 y 05; ARB-DES-06 no, porque
 -- es frances.
-EXEC Arbitraje.usp_DesignarArbitro @IdPartido = @IdPC, @IdArbitro = @Arb1, @RolArbitral = @rolCentral;
+EXEC Arbitraje.usp_DesignarArbitro @IdPartido = @IdPC, @IdArbitro = @Arb1, @RolArbitral = @rolPrincipal;
 SELECT d.IdDesignacion, a.CodigoExterno, d.RolArbitral
 FROM Arbitraje.DesignacionArbitral d
 JOIN Arbitraje.Arbitro a ON a.IdArbitro = d.IdArbitro

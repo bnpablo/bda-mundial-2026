@@ -73,15 +73,15 @@ EXEC Formacion.usp_VerificarAlineacion @IdPartido = @IdP5;
 PRINT '=== Prueba 4: registrar un cambio de cada seleccion ===';
 -- Resultado esperado: se crean 2 sustituciones en el partido 5. Argentina: sale ARG-07 y entra ARG-08 en el
 -- minuto 60 (ventana 1, tactico). Brasil: sale BRA-18 y entra BRA-20 en el minuto 75 (ventana 2, lesion).
-SELECT @IdArg07 = MAX(CASE WHEN CodigoExterno = 'ARG-07' THEN IdJugador END),
-       @IdArg08 = MAX(CASE WHEN CodigoExterno = 'ARG-08' THEN IdJugador END),
-       @IdBra18 = MAX(CASE WHEN CodigoExterno = 'BRA-18' THEN IdJugador END),
-       @IdBra20 = MAX(CASE WHEN CodigoExterno = 'BRA-20' THEN IdJugador END)
+SELECT @IdArg07 = MAX(CASE WHEN CodigoExterno = 'ARG-07' THEN IdJugador ELSE 0 END),
+       @IdArg08 = MAX(CASE WHEN CodigoExterno = 'ARG-08' THEN IdJugador ELSE 0 END),
+       @IdBra18 = MAX(CASE WHEN CodigoExterno = 'BRA-18' THEN IdJugador ELSE 0 END),
+       @IdBra20 = MAX(CASE WHEN CodigoExterno = 'BRA-20' THEN IdJugador ELSE 0 END)
 FROM Torneo.Jugador;
 EXEC Formacion.usp_RegistrarCambio @IdPartido = @IdP5, @IdJugadorSale = @IdArg07, @IdJugadorEntra = @IdArg08,
-     @Periodo = 'SegundoTiempo', @Minuto = 60, @Motivo = 'Tactico', @NumeroVentana = 1, @IdSustitucion = @IdSust OUTPUT;
+     @Periodo = 'Segundo tiempo', @Minuto = 60, @Motivo = 'Tactico', @NumeroVentana = 1, @IdSustitucion = @IdSust OUTPUT;
 EXEC Formacion.usp_RegistrarCambio @IdPartido = @IdP5, @IdJugadorSale = @IdBra18, @IdJugadorEntra = @IdBra20,
-     @Periodo = 'SegundoTiempo', @Minuto = 75, @Motivo = 'Lesion', @NumeroVentana = 2, @IdSustitucion = @IdSust OUTPUT;
+     @Periodo = 'Segundo tiempo', @Minuto = 75, @Motivo = 'Lesion', @NumeroVentana = 2, @IdSustitucion = @IdSust OUTPUT;
 SELECT su.IdSustitucion, js.CodigoExterno AS Sale, je.CodigoExterno AS Entra, su.Minuto, su.NumeroVentana, su.Motivo
 FROM Formacion.Sustitucion su
 JOIN Formacion.Alineacion asa ON asa.IdAlineacion = su.IdAlineacionSale

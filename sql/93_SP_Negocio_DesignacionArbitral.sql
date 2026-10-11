@@ -16,8 +16,11 @@
                 de las dos selecciones del partido, no puede estar ya designado en el
                 partido y no puede estar designado en otro partido con menos de 180
                 minutos de diferencia (el mismo margen que usan los partidos de una
-                misma sede).
- Depende de   : 50_SP_ABM_Arbitraje.sql
+                misma sede). El rol debe ser uno de los de la tabla (Principal,
+                Asistente 1, Asistente 2, Cuarto o VAR) y un partido no puede tener
+                dos arbitros con el mismo rol.
+ Depende de   : 50_SP_ABM_Arbitraje.sql y las tablas de Arbitraje de Avila
+                (04_Tablas_Arbitraje_Incidencia.sql)
 ==============================================================================*/
 USE MundialDB;
 GO
@@ -34,6 +37,7 @@ BEGIN
 
     DECLARE @margenMinutos INT = 180;
     DECLARE @errores VARCHAR(2000) = '';
+    DECLARE @rol VARCHAR(20) = LTRIM(RTRIM(@RolArbitral));
     DECLARE @partidoExiste BIT = 0, @arbitroExiste BIT = 0;
     DECLARE @paisArbitro INT, @paisLocal INT, @paisVisitante INT, @fechaUtc DATETIME2;
 
@@ -55,8 +59,15 @@ BEGIN
     IF @arbitroExiste = 0
         SET @errores += 'El arbitro indicado no existe. ';
 
-    IF @RolArbitral IS NULL OR LTRIM(RTRIM(@RolArbitral)) = ''
+    IF @rol IS NULL OR @rol = ''
         SET @errores += 'El rol arbitral es obligatorio. ';
+    ELSE IF @rol NOT IN ('Principal', 'Asistente 1', 'Asistente 2', 'Cuarto', 'VAR')
+        SET @errores += 'El rol arbitral debe ser Principal, Asistente 1, Asistente 2, Cuarto o VAR. ';
+    ELSE IF @partidoExiste = 1
+         AND EXISTS (SELECT 1
+                     FROM Arbitraje.DesignacionArbitral
+                     WHERE IdPartido = @IdPartido AND RolArbitral = @rol)
+        SET @errores += 'El partido ya tiene un arbitro designado con ese rol. ';
 
     IF @partidoExiste = 1 AND @arbitroExiste = 1
     BEGIN
@@ -85,7 +96,7 @@ BEGIN
         BEGIN TRANSACTION;
 
         INSERT INTO Arbitraje.DesignacionArbitral (IdPartido, IdArbitro, RolArbitral)
-        VALUES (@IdPartido, @IdArbitro, LTRIM(RTRIM(@RolArbitral)));
+        VALUES (@IdPartido, @IdArbitro, @rol);
 
         SET @IdDesignacion = SCOPE_IDENTITY();
 

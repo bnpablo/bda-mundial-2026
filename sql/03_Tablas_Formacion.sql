@@ -3,11 +3,16 @@
  Materia      : Bases de Datos Aplicada (3641)
  Comision     : 02-5600 | Grupo N° 4
  Integrantes  : Avila, Agustin | Blanco, Pablo | Leopaldi, Agustin | Sosa, Jesus
- Fecha        : 2026-10-09
- Script       : 02_Tablas_Torneo.sql
- Objetivo     : Crea las tablas del esquema Torneo (Pais, Sede, Seleccion,
-                Partido, Jugador y CuerpoTecnico) con sus restricciones.
+ Fecha        : 2026-10-11
+ Script       : 03_Tablas_Formacion.sql
+ Objetivo     : Crea las tablas del esquema Formacion (Alineacion y Sustitucion)
+                con sus restricciones e indices.
                 Se puede ejecutar mas de una vez: borra y recrea las tablas.
+ Dominios     : Alineacion.PosicionCancha: POR, DEF, MED, DEL (los de Jugador).
+                Sustitucion.Periodo: Primer tiempo, Segundo tiempo, Alargue 1,
+                Alargue 2 (los mismos que Gol y Tarjeta, sin Penales: no hay
+                cambios en la tanda).
+                Sustitucion.Motivo: Tactico, Lesion, Otro.
 ==============================================================================*/
 
 USE MundialDB;
@@ -24,7 +29,7 @@ CREATE TABLE Formacion.Alineacion (
     IdPartido       int NOT NULL,
     IdJugador       int NOT NULL,
     EsTitular       bit NOT NULL,
-    PosicionCancha  varchar(10) NOT NULL,
+    PosicionCancha  varchar(10) NOT NULL, -- No utilizamos el nombre de mediocampista, sino de volante.
     CONSTRAINT PK_Alineacion PRIMARY KEY CLUSTERED (IdAlineacion),
     CONSTRAINT FK_Alineacion_Partido FOREIGN KEY (IdPartido) REFERENCES Torneo.Partido(IdPartido),
     CONSTRAINT FK_Alineacion_Jugador FOREIGN KEY (IdJugador) REFERENCES Torneo.Jugador(IdJugador),
@@ -62,7 +67,9 @@ CREATE TABLE Formacion.Sustitucion (
     CONSTRAINT PK_Sustitucion PRIMARY KEY CLUSTERED (IdSustitucion),
     CONSTRAINT FK_Sustitucion_Alineacion_Sale  FOREIGN KEY (IdAlineacionSale)  REFERENCES Formacion.Alineacion(IdAlineacion),
     CONSTRAINT FK_Sustitucion_Alineacion_Entra FOREIGN KEY (IdAlineacionEntra) REFERENCES Formacion.Alineacion(IdAlineacion),
-    -- Hasta 120 por la prorroga; la validacion segun el periodo la hace la funcion de minuto valido (75)
+    CONSTRAINT CK_Sustitucion_Periodo CHECK (Periodo IN ('Primer tiempo', 'Segundo tiempo', 'Alargue 1', 'Alargue 2')),
+    CONSTRAINT CK_Sustitucion_Motivo CHECK (Motivo IN ('Tactico', 'Lesion', 'Otro')),
+    -- Rango general (hasta 120 por la prorroga); no se valida el minuto contra el periodo
     CONSTRAINT CK_Sustitucion_MinutoRango CHECK (Minuto BETWEEN 0 AND 120),
     CONSTRAINT CK_Sustitucion_MinutoAdicionalNoNegativo CHECK (MinutoAdicional >= 0),
     CONSTRAINT CK_Sustitucion_SaleDistintoEntra CHECK (IdAlineacionSale <> IdAlineacionEntra)

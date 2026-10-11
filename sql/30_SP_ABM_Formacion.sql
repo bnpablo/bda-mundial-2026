@@ -79,7 +79,7 @@ BEGIN
         IF @pertenece = 1
         BEGIN
             -- COUNT nunca devuelve NULL, por eso no hace falta ISNULL
-            SELECT @titulares = COUNT(CASE WHEN a.EsTitular = 1 THEN 1 END),
+            SELECT @titulares = ISNULL(SUM(CASE WHEN a.EsTitular = 1 THEN 1 ELSE 0 END), 0),
                    @convocados = COUNT(*)
             FROM Formacion.Alineacion a
             JOIN Torneo.Jugador j ON j.IdJugador = a.IdJugador
@@ -254,8 +254,8 @@ BEGIN
     WHERE a.IdAlineacion = @IdAlineacionEntra;
 
     -- Datos del momento del cambio
-    IF @Periodo IS NULL OR LTRIM(RTRIM(@Periodo)) = ''
-        SET @errores += 'El periodo es obligatorio. ';
+    IF @Periodo IS NULL OR @Periodo NOT IN ('Primer tiempo', 'Segundo tiempo', 'Alargue 1', 'Alargue 2')
+        SET @errores += 'El periodo debe ser Primer tiempo, Segundo tiempo, Alargue 1 o Alargue 2. ';
 
     IF @Minuto IS NULL OR @Minuto NOT BETWEEN 0 AND 120
         SET @errores += 'El minuto debe estar entre 0 y 120. ';
@@ -263,8 +263,8 @@ BEGIN
     IF @MinutoAdicional IS NULL OR @MinutoAdicional < 0
         SET @errores += 'El minuto adicional no puede ser negativo. ';
 
-    IF @Motivo IS NULL OR LTRIM(RTRIM(@Motivo)) = ''
-        SET @errores += 'El motivo es obligatorio. ';
+    IF @Motivo IS NULL OR @Motivo NOT IN ('Tactico', 'Lesion', 'Otro')
+        SET @errores += 'El motivo debe ser Tactico, Lesion u Otro. ';
 
     -- Jugadores involucrados
     IF @saleExiste = 0
@@ -351,8 +351,8 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM Formacion.Sustitucion WHERE IdSustitucion = @IdSustitucion)
         SET @errores += 'La sustitucion indicada no existe. ';
 
-    IF @Periodo IS NULL OR LTRIM(RTRIM(@Periodo)) = ''
-        SET @errores += 'El periodo es obligatorio. ';
+    IF @Periodo IS NULL OR @Periodo NOT IN ('Primer tiempo', 'Segundo tiempo', 'Alargue 1', 'Alargue 2')
+        SET @errores += 'El periodo debe ser Primer tiempo, Segundo tiempo, Alargue 1 o Alargue 2. ';
 
     IF @Minuto IS NULL OR @Minuto NOT BETWEEN 0 AND 120
         SET @errores += 'El minuto debe estar entre 0 y 120. ';
@@ -360,8 +360,8 @@ BEGIN
     IF @MinutoAdicional IS NULL OR @MinutoAdicional < 0
         SET @errores += 'El minuto adicional no puede ser negativo. ';
 
-    IF @Motivo IS NULL OR LTRIM(RTRIM(@Motivo)) = ''
-        SET @errores += 'El motivo es obligatorio. ';
+    IF @Motivo IS NULL OR @Motivo NOT IN ('Tactico', 'Lesion', 'Otro')
+        SET @errores += 'El motivo debe ser Tactico, Lesion u Otro. ';
 
     IF @errores <> ''
         THROW 50001, @errores, 1;

@@ -82,7 +82,7 @@ BEGIN
     IF @EsquemaTactico IS NULL OR LTRIM(RTRIM(@EsquemaTactico)) = ''
         SET @errores += 'El esquema tactico es obligatorio. ';
     ELSE IF EXISTS (SELECT 1 FROM STRING_SPLIT(@EsquemaTactico, '-') WHERE value NOT LIKE '[1-9]')
-         OR (SELECT SUM(TRY_CAST(value AS INT)) FROM STRING_SPLIT(@EsquemaTactico, '-')) <> 10
+         OR (SELECT SUM(ISNULL(TRY_CAST(value AS INT), 0)) FROM STRING_SPLIT(@EsquemaTactico, '-')) <> 10
         SET @errores += 'El esquema tactico debe tener la forma 4-3-3 y sumar 10 jugadores de campo. ';
 
     -- Lista de jugadores
@@ -100,7 +100,7 @@ BEGIN
                    PosicionCancha VARCHAR(50) '$.PosicionCancha');
 
         SELECT @cantidad = COUNT(*),
-               @titulares = COUNT(CASE WHEN EsTitular = 1 THEN 1 END)
+               @titulares = ISNULL(SUM(CASE WHEN EsTitular = 1 THEN 1 ELSE 0 END), 0)
         FROM @tmpJugadores;
 
         IF @cantidad NOT BETWEEN @maxTitulares AND @maxConvocados
@@ -164,8 +164,9 @@ GO
 
 /*------------------------------------------------------------------------------
  Formacion.usp_RegistrarCambio
- Un cambio solo se registra con el partido En juego y con los dos jugadores en la
- alineacion del partido. Las demas reglas (suplente que entra, titular o ingresado
+ Un cambio solo se registra con el partido En juego, con los dos jugadores en la
+ alineacion del partido, y con un periodo y un motivo validos (los del CHECK de
+ Sustitucion). Las demas reglas (suplente que entra, titular o ingresado
  que sale, maximo de 5 cambios, etc.) son las de usp_Sustitucion_Alta.
 ------------------------------------------------------------------------------*/
 CREATE OR ALTER PROCEDURE Formacion.usp_RegistrarCambio
@@ -206,6 +207,12 @@ BEGIN
 
     IF @idAlineacionEntra IS NULL
         SET @errores += 'El jugador que entra no esta en la alineacion de este partido. ';
+
+    IF @Periodo IS NULL OR @Periodo NOT IN ('Primer tiempo', 'Segundo tiempo', 'Alargue 1', 'Alargue 2')
+        SET @errores += 'El periodo debe ser Primer tiempo, Segundo tiempo, Alargue 1 o Alargue 2. ';
+
+    IF @Motivo IS NULL OR @Motivo NOT IN ('Tactico', 'Lesion', 'Otro')
+        SET @errores += 'El motivo debe ser Tactico, Lesion u Otro. ';
 
     IF @errores <> ''
         THROW 50001, @errores, 1;
@@ -249,14 +256,14 @@ BEGIN
         THROW 50001, @errores, 1;
 
     SELECT s.IdSeleccion,
-           COUNT(CASE WHEN a.EsTitular = 1 THEN 1 END) AS Titulares,
-           COUNT(CASE WHEN a.EsTitular = 0 THEN 1 END) AS Suplentes,
+           ISNULL(SUM(CASE WHEN a.EsTitular = 1 THEN 1 ELSE 0 END), 0) AS Titulares,
+           ISNULL(SUM(CASE WHEN a.EsTitular = 0 THEN 1 ELSE 0 END), 0) AS Suplentes,
            (SELECT COUNT(*)
             FROM Formacion.Sustitucion su
             JOIN Formacion.Alineacion asale ON asale.IdAlineacion = su.IdAlineacionSale
             JOIN Torneo.Jugador jsale       ON jsale.IdJugador = asale.IdJugador
             WHERE asale.IdPartido = @IdPartido AND jsale.IdSeleccion = s.IdSeleccion) AS Cambios,
-           CASE WHEN COUNT(CASE WHEN a.EsTitular = 1 THEN 1 END) = @maxTitulares
+           CASE WHEN ISNULL(SUM(CASE WHEN a.EsTitular = 1 THEN 1 ELSE 0 END), 0) = @maxTitulares
                 THEN 'OK' ELSE 'INCOMPLETA' END AS Estado
     FROM Torneo.Partido p
     CROSS APPLY (VALUES (p.IdSeleccionLocal), (p.IdSeleccionVisitante)) s(IdSeleccion)

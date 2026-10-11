@@ -12,8 +12,8 @@
                 partido temporal (PARTIDO-934) que se elimina al terminar.
  Requisito    : ejecutar despues de 94_Test_SP_Negocio_DesignacionArbitral_OK.sql. Estado:
                 ARB-DES-01 a 04 designados en PARTIDO-931 (Francia contra Mexico, 22:00
-                UTC del 12/07); ARB-DES-05 Central en PARTIDO-932 (Argentina contra Brasil,
-                23:00 UTC del 12/07); ARB-DES-01 Central en PARTIDO-933 (Argentina contra
+                UTC del 12/07); ARB-DES-05 Principal en PARTIDO-932 (Argentina contra Brasil,
+                23:00 UTC del 12/07); ARB-DES-01 Principal en PARTIDO-933 (Argentina contra
                 Francia, 16/07); ARB-DES-06 (frances) sin designaciones.
 ==============================================================================*/
 USE MundialDB;
@@ -26,10 +26,10 @@ DECLARE @IdPB INT = (SELECT IdPartido FROM Torneo.Partido WHERE CodigoExterno = 
 DECLARE @IdPD INT;
 DECLARE @Arb1 INT, @Arb2 INT, @Arb5 INT, @Arb6 INT;
 
-SELECT @Arb1 = MAX(CASE WHEN CodigoExterno = 'ARB-DES-01' THEN IdArbitro END),
-       @Arb2 = MAX(CASE WHEN CodigoExterno = 'ARB-DES-02' THEN IdArbitro END),
-       @Arb5 = MAX(CASE WHEN CodigoExterno = 'ARB-DES-05' THEN IdArbitro END),
-       @Arb6 = MAX(CASE WHEN CodigoExterno = 'ARB-DES-06' THEN IdArbitro END)
+SELECT @Arb1 = MAX(CASE WHEN CodigoExterno = 'ARB-DES-01' THEN IdArbitro ELSE 0 END),
+       @Arb2 = MAX(CASE WHEN CodigoExterno = 'ARB-DES-02' THEN IdArbitro ELSE 0 END),
+       @Arb5 = MAX(CASE WHEN CodigoExterno = 'ARB-DES-05' THEN IdArbitro ELSE 0 END),
+       @Arb6 = MAX(CASE WHEN CodigoExterno = 'ARB-DES-06' THEN IdArbitro ELSE 0 END)
 FROM Arbitraje.Arbitro;
 
 -- Partido temporal de semifinal con el cruce todavia sin definir (sin selecciones)
@@ -57,7 +57,7 @@ PRINT '=== Prueba 2: partido sin selecciones definidas ===';
 -- Resultado esperado: error 50001 con 1 condicion: el partido necesita las dos selecciones definidas para
 -- designar arbitro (PARTIDO-934 es una semifinal con el cruce por definir).
 BEGIN TRY
-    EXEC Arbitraje.usp_DesignarArbitro @IdPartido = @IdPD, @IdArbitro = @Arb6, @RolArbitral = 'Central';
+    EXEC Arbitraje.usp_DesignarArbitro @IdPartido = @IdPD, @IdArbitro = @Arb6, @RolArbitral = 'Principal';
 END TRY
 BEGIN CATCH
     SELECT ERROR_NUMBER() AS Numero, ERROR_MESSAGE() AS Mensaje;
@@ -67,7 +67,7 @@ PRINT '=== Prueba 3: partido sin selecciones y arbitro inexistente ===';
 -- Resultado esperado: error 50001 con 2 condiciones: el partido necesita las dos selecciones definidas y el
 -- arbitro indicado no existe.
 BEGIN TRY
-    EXEC Arbitraje.usp_DesignarArbitro @IdPartido = @IdPD, @IdArbitro = 999, @RolArbitral = 'Central';
+    EXEC Arbitraje.usp_DesignarArbitro @IdPartido = @IdPD, @IdArbitro = 999, @RolArbitral = 'Principal';
 END TRY
 BEGIN CATCH
     SELECT ERROR_NUMBER() AS Numero, ERROR_MESSAGE() AS Mensaje;
@@ -77,7 +77,7 @@ PRINT '=== Prueba 4: arbitro de la misma nacionalidad que una de las selecciones
 -- Resultado esperado: error 50001 con 1 condicion: el arbitro no puede ser de la misma nacionalidad que alguna
 -- de las selecciones del partido (ARB-DES-06 es frances y PARTIDO-931 es Francia contra Mexico).
 BEGIN TRY
-    EXEC Arbitraje.usp_DesignarArbitro @IdPartido = @IdPA, @IdArbitro = @Arb6, @RolArbitral = 'Central';
+    EXEC Arbitraje.usp_DesignarArbitro @IdPartido = @IdPA, @IdArbitro = @Arb6, @RolArbitral = 'VAR';
 END TRY
 BEGIN CATCH
     SELECT ERROR_NUMBER() AS Numero, ERROR_MESSAGE() AS Mensaje;
@@ -88,7 +88,7 @@ PRINT '=== Prueba 5: arbitro de la misma nacionalidad y designado en otro partid
 -- de las selecciones (ARB-DES-05 es mexicano y PARTIDO-931 es Francia contra Mexico) y ya esta designado en
 -- otro partido con menos de 180 minutos de diferencia (PARTIDO-932, una hora despues).
 BEGIN TRY
-    EXEC Arbitraje.usp_DesignarArbitro @IdPartido = @IdPA, @IdArbitro = @Arb5, @RolArbitral = 'Asistente 1';
+    EXEC Arbitraje.usp_DesignarArbitro @IdPartido = @IdPA, @IdArbitro = @Arb5, @RolArbitral = 'VAR';
 END TRY
 BEGIN CATCH
     SELECT ERROR_NUMBER() AS Numero, ERROR_MESSAGE() AS Mensaje;
@@ -96,7 +96,7 @@ END CATCH
 
 PRINT '=== Prueba 6: arbitro ya designado en el partido y sin rol ===';
 -- Resultado esperado: error 50001 con 2 condiciones: el rol arbitral es obligatorio y el arbitro ya esta
--- designado en este partido (ARB-DES-01 ya es Central de PARTIDO-931).
+-- designado en este partido (ARB-DES-01 ya es Principal de PARTIDO-931).
 BEGIN TRY
     EXEC Arbitraje.usp_DesignarArbitro @IdPartido = @IdPA, @IdArbitro = @Arb1, @RolArbitral = NULL;
 END TRY
@@ -115,10 +115,32 @@ BEGIN CATCH
     SELECT ERROR_NUMBER() AS Numero, ERROR_MESSAGE() AS Mensaje;
 END CATCH
 
+PRINT '=== Prueba 8: rol que no existe ===';
+-- Resultado esperado: error 50001 con 1 condicion: el rol arbitral debe ser Principal, Asistente 1,
+-- Asistente 2, Cuarto o VAR ('Linea' no es un rol valido). Sin esta validacion fallaria el CHECK de la tabla con
+-- el error crudo de la constraint.
+BEGIN TRY
+    EXEC Arbitraje.usp_DesignarArbitro @IdPartido = @IdPB, @IdArbitro = @Arb6, @RolArbitral = 'Linea';
+END TRY
+BEGIN CATCH
+    SELECT ERROR_NUMBER() AS Numero, ERROR_MESSAGE() AS Mensaje;
+END CATCH
+
+PRINT '=== Prueba 9: rol que el partido ya tiene cubierto ===';
+-- Resultado esperado: error 50001 con 1 condicion: el partido ya tiene un arbitro designado con ese rol
+-- (ARB-DES-05 ya es Principal de PARTIDO-932). Sin esta validacion fallaria el UNIQUE (IdPartido, RolArbitral)
+-- con el error crudo de la constraint.
+BEGIN TRY
+    EXEC Arbitraje.usp_DesignarArbitro @IdPartido = @IdPB, @IdArbitro = @Arb6, @RolArbitral = 'Principal';
+END TRY
+BEGIN CATCH
+    SELECT ERROR_NUMBER() AS Numero, ERROR_MESSAGE() AS Mensaje;
+END CATCH
+
 /*------------------------------------------------------------------------------
  ARBITROS ELEGIBLES
 ------------------------------------------------------------------------------*/
-PRINT '=== Prueba 8: elegibles de un partido inexistente ===';
+PRINT '=== Prueba 10: elegibles de un partido inexistente ===';
 -- Resultado esperado: error 50001: "El partido indicado no existe."
 BEGIN TRY
     EXEC Arbitraje.usp_ListarArbitrosElegibles @IdPartido = 999;
@@ -127,7 +149,7 @@ BEGIN CATCH
     SELECT ERROR_NUMBER() AS Numero, ERROR_MESSAGE() AS Mensaje;
 END CATCH
 
-PRINT '=== Prueba 9: elegibles de un partido sin selecciones definidas ===';
+PRINT '=== Prueba 11: elegibles de un partido sin selecciones definidas ===';
 -- Resultado esperado: error 50001: "El partido necesita las dos selecciones definidas para listar arbitros
 -- elegibles." (en lugar de devolver una lista vacia).
 BEGIN TRY
