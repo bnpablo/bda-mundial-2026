@@ -4,10 +4,10 @@
  Comision     : 02-5600 | Grupo N° 4
  Integrantes  : Avila, Agustin | Blanco, Pablo | Leopaldi, Agustin | Sosa, Jesus
  Fecha        : 2026-10-11
- Script       : 93_Test_SP_ABM_Publicidad_OK.sql
- Objetivo     : Testing exitoso de 92_SP_ABM_Publicidad.sql (relacion 1:1): alta,
+ Script       : 61_Test_SP_ABM_Publicidad_OK.sql
+ Objetivo     : Testing exitoso de 60_SP_ABM_Publicidad.sql (relacion 1:1): alta,
                 modificacion y baja de las 6 tablas de Publicidad. Deja cargados
-                los datos que usan los tests 94, 96 y 97:
+                los datos que usan los tests 62, 97 y 98:
                   5 anunciantes, cada uno con la campania "Mundial 2026"
                   (01/06 al 31/07/2026) y sus piezas:
                     Bebidas del Sur     Spot Uruguay (URY) y Spot Colombia (COL)
@@ -16,8 +16,11 @@
                     Telefonia Global    Spot Estados Unidos (USA)
                     Deportes del Norte  Spot Portugal (POR)
                   Tarifas: Grupos (junio, USD 55000) y Tercer puesto (julio, USD 80000).
- Requisito    : ejecutar despues de 92_SP_ABM_Publicidad.sql y de los tests 87 a 91
-                (usa los paises y los partidos INC-P de esos tests). Una sola vez.
+ Requisito    : ejecutar despues de los scripts de Torneo (01, 02, 10..12, 20..22, 80..85),
+                de Formacion (03, 30..32) y de Arbitraje e Incidencia (04, 75, 50..52,
+                90..92), en ese orden: los tests usan las tablas y los SP de esos
+                modulos y los paises y partidos INC-P que cargan sus tests. Despues de
+                60_SP_ABM_Publicidad.sql. Una sola vez.
 ==============================================================================*/
 USE MundialDB;
 GO

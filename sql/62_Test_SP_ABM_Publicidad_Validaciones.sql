@@ -4,14 +4,15 @@
  Comision     : 02-5600 | Grupo N° 4
  Integrantes  : Avila, Agustin | Blanco, Pablo | Leopaldi, Agustin | Sosa, Jesus
  Fecha        : 2026-10-11
- Script       : 94_Test_SP_ABM_Publicidad_Validaciones.sql
- Objetivo     : Testing de las validaciones de 92_SP_ABM_Publicidad.sql (relacion 1:1).
+ Script       : 62_Test_SP_ABM_Publicidad_Validaciones.sql
+ Objetivo     : Testing de las validaciones de 60_SP_ABM_Publicidad.sql (relacion 1:1).
                 Cada caso invalido se ejecuta dentro de TRY/CATCH: muestra el numero
                 de error y el mensaje unico que agrupa todas las condiciones que no
                 se cumplen. La prueba 15 vende un espacio para probar las reglas
                 que dependen de el y al final lo elimina, asi que el script no deja
                 datos nuevos.
- Requisito    : ejecutar despues de 93_Test_SP_ABM_Publicidad_OK.sql.
+ Requisito    : ejecutar despues de 61_Test_SP_ABM_Publicidad_OK.sql (y de lo que ese test
+                requiere: Torneo, Formacion y Arbitraje e Incidencia cargados).
 ==============================================================================*/
 USE MundialDB;
 GO
