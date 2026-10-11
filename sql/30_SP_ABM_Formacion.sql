@@ -3,7 +3,7 @@
  Materia      : Bases de Datos Aplicada (3641)
  Comision     : 02-5600 | Grupo N° 4
  Integrantes  : Avila, Agustin | Blanco, Pablo | Leopaldi, Agustin | Sosa, Jesus
- Fecha        : 2026-10-10
+ Fecha        : 2026-10-11
  Script       : 30_SP_ABM_Formacion.sql
  Objetivo     : Crea los SP de alta, baja y modificacion de Alineacion y
                 Sustitucion (esquema Formacion). Cada SP valida todo primero
@@ -30,7 +30,7 @@ BEGIN
     SET XACT_ABORT ON;
 
     DECLARE @maxTitulares INT = 11, @maxConvocados INT = 26;
-    DECLARE @errores NVARCHAR(MAX) = N'';
+    DECLARE @errores VARCHAR(2000) = '';
     DECLARE @partidoExiste BIT = 0, @jugadorExiste BIT = 0, @pertenece BIT = 0;
     DECLARE @idSeleccionLocal INT, @idSeleccionVisitante INT, @fechaPartido DATE;
     DECLARE @idSeleccionJugador INT, @fechaBaja DATE;
@@ -50,16 +50,16 @@ BEGIN
     WHERE j.IdJugador = @IdJugador;
 
     IF @partidoExiste = 0
-        SET @errores += N'El partido indicado no existe. ';
+        SET @errores += 'El partido indicado no existe. ';
 
     IF @jugadorExiste = 0
-        SET @errores += N'El jugador indicado no existe. ';
+        SET @errores += 'El jugador indicado no existe. ';
 
     IF @EsTitular IS NULL
-        SET @errores += N'Debe indicarse si el jugador es titular. ';
+        SET @errores += 'Debe indicarse si el jugador es titular. ';
 
     IF @PosicionCancha IS NULL OR @PosicionCancha NOT IN ('POR', 'DEF', 'MED', 'DEL')
-        SET @errores += N'La posicion en cancha debe ser POR, DEF, MED o DEL. ';
+        SET @errores += 'La posicion en cancha debe ser POR, DEF, MED o DEL. ';
 
     IF @partidoExiste = 1 AND @jugadorExiste = 1
     BEGIN
@@ -68,13 +68,13 @@ BEGIN
                                 OR @idSeleccionJugador = @idSeleccionVisitante THEN 1 ELSE 0 END;
 
         IF @pertenece = 0
-            SET @errores += N'El jugador no pertenece a ninguna de las dos selecciones del partido. ';
+            SET @errores += 'El jugador no pertenece a ninguna de las dos selecciones del partido. ';
 
         IF @fechaBaja IS NOT NULL AND @fechaBaja <= @fechaPartido
-            SET @errores += N'El jugador estaba dado de baja a la fecha del partido. ';
+            SET @errores += 'El jugador estaba dado de baja a la fecha del partido. ';
 
         IF EXISTS (SELECT 1 FROM Formacion.Alineacion WHERE IdPartido = @IdPartido AND IdJugador = @IdJugador)
-            SET @errores += N'El jugador ya esta en la alineacion de este partido. ';
+            SET @errores += 'El jugador ya esta en la alineacion de este partido. ';
 
         IF @pertenece = 1
         BEGIN
@@ -86,13 +86,13 @@ BEGIN
             WHERE a.IdPartido = @IdPartido AND j.IdSeleccion = @idSeleccionJugador;
 
             IF @EsTitular = 1 AND @titulares >= @maxTitulares
-                SET @errores += CONCAT(N'La seleccion ya tiene ', @maxTitulares, N' titulares en este partido. ');
+                SET @errores += CONCAT('La seleccion ya tiene ', @maxTitulares, ' titulares en este partido. ');
             IF @convocados >= @maxConvocados
-                SET @errores += CONCAT(N'La seleccion ya tiene el maximo de ', @maxConvocados, N' convocados para este partido. ');
+                SET @errores += CONCAT('La seleccion ya tiene el maximo de ', @maxConvocados, ' convocados para este partido. ');
         END
     END
 
-    IF @errores <> N''
+    IF @errores <> ''
         THROW 50001, @errores, 1;
 
     BEGIN TRY
@@ -123,7 +123,7 @@ BEGIN
     SET XACT_ABORT ON;
 
     DECLARE @maxTitulares INT = 11;
-    DECLARE @errores NVARCHAR(MAX) = N'';
+    DECLARE @errores VARCHAR(2000) = '';
     DECLARE @alineacionExiste BIT = 0;
     DECLARE @idPartido INT, @idSeleccion INT, @titularActual BIT, @titulares INT;
 
@@ -136,20 +136,20 @@ BEGIN
     WHERE a.IdAlineacion = @IdAlineacion;
 
     IF @alineacionExiste = 0
-        SET @errores += N'La alineacion indicada no existe. ';
+        SET @errores += 'La alineacion indicada no existe. ';
 
     IF @EsTitular IS NULL
-        SET @errores += N'Debe indicarse si el jugador es titular. ';
+        SET @errores += 'Debe indicarse si el jugador es titular. ';
 
     IF @PosicionCancha IS NULL OR @PosicionCancha NOT IN ('POR', 'DEF', 'MED', 'DEL')
-        SET @errores += N'La posicion en cancha debe ser POR, DEF, MED o DEL. ';
+        SET @errores += 'La posicion en cancha debe ser POR, DEF, MED o DEL. ';
 
     IF @alineacionExiste = 1 AND @EsTitular IS NOT NULL AND @titularActual <> @EsTitular
     BEGIN
         IF EXISTS (SELECT 1
                    FROM Formacion.Sustitucion
                    WHERE IdAlineacionSale = @IdAlineacion OR IdAlineacionEntra = @IdAlineacion)
-            SET @errores += N'No se puede cambiar la condicion de titular: el jugador participa de una sustitucion. ';
+            SET @errores += 'No se puede cambiar la condicion de titular: el jugador participa de una sustitucion. ';
 
         IF @EsTitular = 1
         BEGIN
@@ -159,11 +159,11 @@ BEGIN
             WHERE a.IdPartido = @idPartido AND j.IdSeleccion = @idSeleccion AND a.EsTitular = 1;
 
             IF @titulares >= @maxTitulares
-                SET @errores += CONCAT(N'La seleccion ya tiene ', @maxTitulares, N' titulares en este partido. ');
+                SET @errores += CONCAT('La seleccion ya tiene ', @maxTitulares, ' titulares en este partido. ');
         END
     END
 
-    IF @errores <> N''
+    IF @errores <> ''
         THROW 50001, @errores, 1;
 
     BEGIN TRY
@@ -191,16 +191,16 @@ BEGIN
     SET NOCOUNT ON;
     SET XACT_ABORT ON;
 
-    DECLARE @errores NVARCHAR(MAX) = N'';
+    DECLARE @errores VARCHAR(2000) = '';
 
     IF NOT EXISTS (SELECT 1 FROM Formacion.Alineacion WHERE IdAlineacion = @IdAlineacion)
-        SET @errores += N'La alineacion indicada no existe. ';
+        SET @errores += 'La alineacion indicada no existe. ';
     ELSE IF EXISTS (SELECT 1
                     FROM Formacion.Sustitucion
                     WHERE IdAlineacionSale = @IdAlineacion OR IdAlineacionEntra = @IdAlineacion)
-        SET @errores += N'No se puede eliminar: el jugador participa de una sustitucion. ';
+        SET @errores += 'No se puede eliminar: el jugador participa de una sustitucion. ';
 
-    IF @errores <> N''
+    IF @errores <> ''
         THROW 50001, @errores, 1;
 
     BEGIN TRY
@@ -213,7 +213,7 @@ BEGIN
     BEGIN CATCH
         IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
         IF ERROR_NUMBER() = 547
-            THROW 50001, N'No se puede eliminar la alineacion: otros registros (goles o tarjetas) dependen de ella. ', 1;
+            THROW 50001, 'No se puede eliminar la alineacion: otros registros (goles o tarjetas) dependen de ella. ', 1;
         THROW;
     END CATCH
 END
@@ -237,7 +237,7 @@ BEGIN
     SET XACT_ABORT ON;
 
     DECLARE @maxCambios INT = 5;
-    DECLARE @errores NVARCHAR(MAX) = N'';
+    DECLARE @errores VARCHAR(2000) = '';
     DECLARE @saleExiste BIT = 0, @entraExiste BIT = 0;
     DECLARE @partidoSale INT, @selSale INT, @titSale BIT;
     DECLARE @partidoEntra INT, @selEntra INT, @titEntra BIT;
@@ -255,50 +255,50 @@ BEGIN
 
     -- Datos del momento del cambio
     IF @Periodo IS NULL OR LTRIM(RTRIM(@Periodo)) = ''
-        SET @errores += N'El periodo es obligatorio. ';
+        SET @errores += 'El periodo es obligatorio. ';
 
     IF @Minuto IS NULL OR @Minuto NOT BETWEEN 0 AND 120
-        SET @errores += N'El minuto debe estar entre 0 y 120. ';
+        SET @errores += 'El minuto debe estar entre 0 y 120. ';
 
     IF @MinutoAdicional IS NULL OR @MinutoAdicional < 0
-        SET @errores += N'El minuto adicional no puede ser negativo. ';
+        SET @errores += 'El minuto adicional no puede ser negativo. ';
 
     IF @Motivo IS NULL OR LTRIM(RTRIM(@Motivo)) = ''
-        SET @errores += N'El motivo es obligatorio. ';
+        SET @errores += 'El motivo es obligatorio. ';
 
     -- Jugadores involucrados
     IF @saleExiste = 0
-        SET @errores += N'La alineacion del jugador que sale no existe. ';
+        SET @errores += 'La alineacion del jugador que sale no existe. ';
 
     IF @entraExiste = 0
-        SET @errores += N'La alineacion del jugador que entra no existe. ';
+        SET @errores += 'La alineacion del jugador que entra no existe. ';
 
     IF @IdAlineacionSale = @IdAlineacionEntra
-        SET @errores += N'El jugador que sale y el que entra deben ser distintos. ';
+        SET @errores += 'El jugador que sale y el que entra deben ser distintos. ';
 
     IF @saleExiste = 1 AND @entraExiste = 1 AND @IdAlineacionSale <> @IdAlineacionEntra
     BEGIN
         IF @partidoSale <> @partidoEntra
         BEGIN
-            SET @errores += N'Los dos jugadores deben ser del mismo partido. ';
+            SET @errores += 'Los dos jugadores deben ser del mismo partido. ';
         END
         ELSE
         BEGIN
             IF @selSale <> @selEntra
-                SET @errores += N'Los dos jugadores deben pertenecer a la misma seleccion. ';
+                SET @errores += 'Los dos jugadores deben pertenecer a la misma seleccion. ';
 
             IF @titEntra = 1
-                SET @errores += N'El jugador que entra debe ser suplente. ';
+                SET @errores += 'El jugador que entra debe ser suplente. ';
 
             IF @titSale = 0
                AND NOT EXISTS (SELECT 1 FROM Formacion.Sustitucion WHERE IdAlineacionEntra = @IdAlineacionSale)
-                SET @errores += N'El jugador que sale es suplente y todavia no ingreso al campo. ';
+                SET @errores += 'El jugador que sale es suplente y todavia no ingreso al campo. ';
 
             IF EXISTS (SELECT 1 FROM Formacion.Sustitucion WHERE IdAlineacionSale = @IdAlineacionSale)
-                SET @errores += N'El jugador que sale ya fue reemplazado. ';
+                SET @errores += 'El jugador que sale ya fue reemplazado. ';
 
             IF EXISTS (SELECT 1 FROM Formacion.Sustitucion WHERE IdAlineacionEntra = @IdAlineacionEntra)
-                SET @errores += N'El jugador que entra ya ingreso en otra sustitucion. ';
+                SET @errores += 'El jugador que entra ya ingreso en otra sustitucion. ';
 
             SELECT @cambios = COUNT(*)
             FROM Formacion.Sustitucion su
@@ -307,11 +307,11 @@ BEGIN
             WHERE asale.IdPartido = @partidoSale AND jsale.IdSeleccion = @selSale;
 
             IF @cambios >= @maxCambios
-                SET @errores += CONCAT(N'La seleccion ya uso el maximo de ', @maxCambios, N' cambios en este partido. ');
+                SET @errores += CONCAT('La seleccion ya uso el maximo de ', @maxCambios, ' cambios en este partido. ');
         END
     END
 
-    IF @errores <> N''
+    IF @errores <> ''
         THROW 50001, @errores, 1;
 
     BEGIN TRY
@@ -346,24 +346,24 @@ BEGIN
     SET NOCOUNT ON;
     SET XACT_ABORT ON;
 
-    DECLARE @errores NVARCHAR(MAX) = N'';
+    DECLARE @errores VARCHAR(2000) = '';
 
     IF NOT EXISTS (SELECT 1 FROM Formacion.Sustitucion WHERE IdSustitucion = @IdSustitucion)
-        SET @errores += N'La sustitucion indicada no existe. ';
+        SET @errores += 'La sustitucion indicada no existe. ';
 
     IF @Periodo IS NULL OR LTRIM(RTRIM(@Periodo)) = ''
-        SET @errores += N'El periodo es obligatorio. ';
+        SET @errores += 'El periodo es obligatorio. ';
 
     IF @Minuto IS NULL OR @Minuto NOT BETWEEN 0 AND 120
-        SET @errores += N'El minuto debe estar entre 0 y 120. ';
+        SET @errores += 'El minuto debe estar entre 0 y 120. ';
 
     IF @MinutoAdicional IS NULL OR @MinutoAdicional < 0
-        SET @errores += N'El minuto adicional no puede ser negativo. ';
+        SET @errores += 'El minuto adicional no puede ser negativo. ';
 
     IF @Motivo IS NULL OR LTRIM(RTRIM(@Motivo)) = ''
-        SET @errores += N'El motivo es obligatorio. ';
+        SET @errores += 'El motivo es obligatorio. ';
 
-    IF @errores <> N''
+    IF @errores <> ''
         THROW 50001, @errores, 1;
 
     BEGIN TRY
@@ -390,7 +390,7 @@ BEGIN
     SET NOCOUNT ON;
     SET XACT_ABORT ON;
 
-    DECLARE @errores NVARCHAR(MAX) = N'';
+    DECLARE @errores VARCHAR(2000) = '';
     DECLARE @sustitucionExiste BIT = 0, @idEntra INT;
 
     SELECT @sustitucionExiste = 1, @idEntra = IdAlineacionEntra
@@ -398,12 +398,12 @@ BEGIN
     WHERE IdSustitucion = @IdSustitucion;
 
     IF @sustitucionExiste = 0
-        SET @errores += N'La sustitucion indicada no existe. ';
+        SET @errores += 'La sustitucion indicada no existe. ';
     -- Si el jugador que entro volvio a salir, no se puede anular el cambio que lo hizo entrar
     ELSE IF EXISTS (SELECT 1 FROM Formacion.Sustitucion WHERE IdAlineacionSale = @idEntra)
-        SET @errores += N'No se puede eliminar: el jugador que entro fue reemplazado luego. ';
+        SET @errores += 'No se puede eliminar: el jugador que entro fue reemplazado luego. ';
 
-    IF @errores <> N''
+    IF @errores <> ''
         THROW 50001, @errores, 1;
 
     BEGIN TRY
