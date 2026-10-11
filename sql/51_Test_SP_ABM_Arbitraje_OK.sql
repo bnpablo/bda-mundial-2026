@@ -4,10 +4,10 @@
  Comision     : 02-5600 | Grupo N° 4
  Integrantes  : Avila, Agustin | Blanco, Pablo | Leopaldi, Agustin | Sosa, Jesus
  Fecha        : 2026-10-11
- Script       : 87_Test_SP_ABM_Arbitraje_OK.sql
- Objetivo     : Testing exitoso de 86_SP_ABM_Arbitraje.sql (relacion 1:1).
+ Script       : 51_Test_SP_ABM_Arbitraje_OK.sql
+ Objetivo     : Testing exitoso de 50_SP_ABM_Arbitraje.sql (relacion 1:1).
                 Primero prepara, solo con los SP de alta de Torneo, los datos que usan
-                los tests de Arbitraje e Incidencia (87 a 91):
+                los tests de Arbitraje e Incidencia (51, 52, 91 y 92):
                   - Paises URY, COL, ECU (selecciones del grupo H), ITA, POR y NED
                     (arbitros) y USA (sede) si todavia no existe.
                   - Sede SEDE-TEST-INC (capacidad 72000).
@@ -21,9 +21,11 @@
                       INC-P4 Octavos        ECU - URY
                       INC-P5 Cuartos        URY - ECU
                       INC-P6 Tercer puesto  COL - ECU  (queda Programado)
- Requisito    : ejecutar despues de 86_SP_ABM_Arbitraje.sql. Usa codigos que no usan
-                los tests 11 a 85, asi que funciona aunque esos tests se hayan
-                ejecutado antes o no.
+ Requisito    : ejecutar despues de 50_SP_ABM_Arbitraje.sql y de 80_SP_Negocio_Partidos.sql
+                (la prueba 6 inicia y finaliza INC-P0 con Torneo.usp_IniciarPartido y
+                Torneo.usp_FinalizarPartido). Los datos de prueba usan codigos propios
+                (INC-, SEDE-TEST-INC, URY-nn, COL-nn, ECU-nn), asi que no dependen de
+                lo que carguen los tests de Torneo ni de Formacion. Una sola vez.
 ==============================================================================*/
 USE MundialDB;
 GO

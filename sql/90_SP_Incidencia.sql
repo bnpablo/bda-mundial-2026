@@ -4,7 +4,7 @@
  Comision     : 02-5600 | Grupo N° 4
  Integrantes  : Avila, Agustin | Blanco, Pablo | Leopaldi, Agustin | Sosa, Jesus
  Fecha        : 2026-10-11
- Script       : 89_SP_Incidencia.sql
+ Script       : 90_SP_Incidencia.sql
  Objetivo     : Procedimientos de goles y tarjetas. El alta y la baja son logica de
                 negocio porque tambien cambian otras filas (el marcador del partido
                 o la roja por doble amarilla); la modificacion es un ABM simple:
@@ -17,7 +17,7 @@
                   Incidencia.usp_Tarjeta_Modificacion corrige minuto y motivo de una tarjeta.
                 Los goles y las tarjetas se cargan, anulan y corrigen solo con el
                 partido En juego (estados de 80_SP_Negocio_Partidos.sql).
- Prerrequisito: 05_Funciones_Incidencia.sql.
+ Prerrequisito: 75_Funciones_Incidencia.sql.
 ==============================================================================*/
 USE MundialDB;
 GO

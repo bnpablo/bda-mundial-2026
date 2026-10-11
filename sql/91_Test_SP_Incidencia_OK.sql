@@ -4,16 +4,17 @@
  Comision     : 02-5600 | Grupo N° 4
  Integrantes  : Avila, Agustin | Blanco, Pablo | Leopaldi, Agustin | Sosa, Jesus
  Fecha        : 2026-10-11
- Script       : 90_Test_SP_Incidencia_OK.sql
- Objetivo     : Testing exitoso de 89_SP_Incidencia.sql (relacion 1:1) y del calculo
-                de suspensiones de 05_Funciones_Incidencia.sql. Cubre los casos
+ Script       : 91_Test_SP_Incidencia_OK.sql
+ Objetivo     : Testing exitoso de 90_SP_Incidencia.sql (relacion 1:1) y del calculo
+                de suspensiones de 75_Funciones_Incidencia.sql. Cubre los casos
                 obligatorios: partido con doble amarilla, partido con roja directa y
                 jugador suspendido por acumulacion para el partido siguiente.
                 Partidos de Uruguay: P1 (Grupos), P2 (Grupos), P3 (Dieciseisavos),
                 P4 (Octavos) y P5 (Cuartos). Colombia juega P1 y P3; Ecuador P2, P4 y P5.
- Requisito    : ejecutar despues de 88_Test_SP_ABM_Arbitraje_Validaciones.sql (usa los
-                partidos y jugadores que prepara el script 87) y de 30_SP_ABM_Formacion.sql
-                (alineaciones y sustitucion).
+ Requisito    : ejecutar despues de 52_Test_SP_ABM_Arbitraje_Validaciones.sql (usa los
+                partidos y jugadores que prepara el script 51), de 30_SP_ABM_Formacion.sql
+                (alineaciones y sustitucion) y de 80_SP_Negocio_Partidos.sql (inicia
+                P1 a P5).
 ==============================================================================*/
 USE MundialDB;
 GO

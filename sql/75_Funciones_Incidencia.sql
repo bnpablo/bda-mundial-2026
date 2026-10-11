@@ -4,7 +4,7 @@
  Comision     : 02-5600 | Grupo N° 4
  Integrantes  : Avila, Agustin | Blanco, Pablo | Leopaldi, Agustin | Sosa, Jesus
  Fecha        : 2026-10-11
- Script       : 05_Funciones_Incidencia.sql
+ Script       : 75_Funciones_Incidencia.sql
  Objetivo     : Funciones que usan los SP de goles y tarjetas:
                   Incidencia.fn_OrdenFase           orden numerico de una fase.
                   Incidencia.fn_MinutoValido        si un minuto corresponde a un periodo.

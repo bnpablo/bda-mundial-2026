@@ -4,12 +4,12 @@
  Comision     : 02-5600 | Grupo N° 4
  Integrantes  : Avila, Agustin | Blanco, Pablo | Leopaldi, Agustin | Sosa, Jesus
  Fecha        : 2026-10-11
- Script       : 88_Test_SP_ABM_Arbitraje_Validaciones.sql
- Objetivo     : Testing de las validaciones de 86_SP_ABM_Arbitraje.sql (relacion 1:1).
+ Script       : 52_Test_SP_ABM_Arbitraje_Validaciones.sql
+ Objetivo     : Testing de las validaciones de 50_SP_ABM_Arbitraje.sql (relacion 1:1).
                 Cada caso invalido se ejecuta dentro de TRY/CATCH: muestra el numero
                 de error y el mensaje unico que agrupa todas las condiciones que no
                 se cumplen. Incluye el conflicto de nacionalidad (error 50002).
- Requisito    : ejecutar despues de 87_Test_SP_ABM_Arbitraje_OK.sql. Estado: INC-P0
+ Requisito    : ejecutar despues de 51_Test_SP_ABM_Arbitraje_OK.sql. Estado: INC-P0
                 Finalizado (Silva Principal con informe, Rossi VAR); INC-P1 Programado
                 (Uruguay - Colombia: Rossi Principal, Silva Cuarto).
 ==============================================================================*/

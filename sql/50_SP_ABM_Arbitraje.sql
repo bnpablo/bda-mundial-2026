@@ -4,7 +4,7 @@
  Comision     : 02-5600 | Grupo N° 4
  Integrantes  : Avila, Agustin | Blanco, Pablo | Leopaldi, Agustin | Sosa, Jesus
  Fecha        : 2026-10-11
- Script       : 86_SP_ABM_Arbitraje.sql
+ Script       : 50_SP_ABM_Arbitraje.sql
  Objetivo     : Procedimientos de alta, baja y modificacion de Arbitro,
                 ArbitroIdioma y DesignacionArbitral. Cada SP informa en un unico
                 mensaje todas las validaciones que no se cumplen (error 50001).
