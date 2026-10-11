@@ -4,13 +4,13 @@
  Comision     : 02-5600 | Grupo N° 4
  Integrantes  : Avila, Agustin | Blanco, Pablo | Leopaldi, Agustin | Sosa, Jesus
  Fecha        : 2026-10-11
- Script       : 92_SP_ABM_Publicidad.sql
+ Script       : 60_SP_ABM_Publicidad.sql
  Objetivo     : Procedimientos de alta, baja y modificacion de Anunciante, Campania,
                 Pieza, PiezaPais, TarifaPublicitaria y PublicidadPartido. Cada SP
                 informa en un unico mensaje todas las validaciones que no se
                 cumplen. La modificacion es completa: se envian todos los datos y
                 se reemplazan todos.
- Prerrequisito: 07_Funciones_Publicidad.sql.
+ Prerrequisito: 70_Funciones_Publicidad.sql.
 ==============================================================================*/
 USE MundialDB;
 GO
