@@ -12,7 +12,7 @@
                 Sustitucion.Periodo: Primer tiempo, Segundo tiempo, Alargue 1,
                 Alargue 2 (los mismos que Gol y Tarjeta, sin Penales: no hay
                 cambios en la tanda).
-                Sustitucion.Motivo: Tactico, Lesion, Otro.
+                Sustitucion.Motivo: Tactico, Lesion, Precaucion.
 ==============================================================================*/
 
 USE MundialDB;
@@ -68,7 +68,7 @@ CREATE TABLE Formacion.Sustitucion (
     CONSTRAINT FK_Sustitucion_Alineacion_Sale  FOREIGN KEY (IdAlineacionSale)  REFERENCES Formacion.Alineacion(IdAlineacion),
     CONSTRAINT FK_Sustitucion_Alineacion_Entra FOREIGN KEY (IdAlineacionEntra) REFERENCES Formacion.Alineacion(IdAlineacion),
     CONSTRAINT CK_Sustitucion_Periodo CHECK (Periodo IN ('Primer tiempo', 'Segundo tiempo', 'Alargue 1', 'Alargue 2')),
-    CONSTRAINT CK_Sustitucion_Motivo CHECK (Motivo IN ('Tactico', 'Lesion', 'Otro')),
+    CONSTRAINT CK_Sustitucion_Motivo CHECK (Motivo IN ('Tactico', 'Lesion', 'Precaucion')),
     -- Rango general (hasta 120 por la prorroga); no se valida el minuto contra el periodo
     CONSTRAINT CK_Sustitucion_MinutoRango CHECK (Minuto BETWEEN 0 AND 120),
     CONSTRAINT CK_Sustitucion_MinutoAdicionalNoNegativo CHECK (MinutoAdicional >= 0),

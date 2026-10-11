@@ -152,7 +152,7 @@ END CATCH
 
 PRINT '=== Prueba 10: cambio entre jugadores de distinta seleccion ===';
 -- Resultado esperado: error 50001 con 2 condiciones: los dos jugadores deben pertenecer a la misma seleccion
--- (sale ARG-11 y entra BRA-12) y la seleccion que sale (Argentina) ya uso el maximo de 5 cambios.
+-- (sale ARG-11 y entra BRA-12) y la seleccion que sale (Argentina) ya uso los 5 cambios del tiempo reglamentario.
 BEGIN TRY
     EXEC Formacion.usp_Sustitucion_Alta @IdAlineacionSale = @Al11, @IdAlineacionEntra = @AlBra12,
          @Periodo = 'Segundo tiempo', @Minuto = 80, @Motivo = 'Tactico';
@@ -162,8 +162,9 @@ BEGIN CATCH
 END CATCH
 
 PRINT '=== Prueba 11: sexto cambio de una seleccion ===';
--- Resultado esperado: error 50001 con 1 condicion: la seleccion ya uso el maximo de 5 cambios en este partido
--- (sale ARG-19, titular que sigue en cancha, y entra ARG-16, suplente que no ingreso).
+-- Resultado esperado: error 50001 con 1 condicion: la seleccion ya uso los 5 cambios del tiempo reglamentario
+-- (el sexto solo se permite en la prorroga). Sale ARG-19, titular que sigue en cancha, y entra ARG-16, suplente
+-- que no ingreso.
 BEGIN TRY
     EXEC Formacion.usp_Sustitucion_Alta @IdAlineacionSale = @Al19, @IdAlineacionEntra = @Al16,
          @Periodo = 'Segundo tiempo', @Minuto = 88, @Motivo = 'Tactico';
@@ -174,7 +175,7 @@ END CATCH
 
 PRINT '=== Prueba 12: jugador que sale ya reemplazado y que entra ya ingreso ===';
 -- Resultado esperado: error 50001 con 3 condiciones: el jugador que sale ya fue reemplazado (ARG-07), el
--- jugador que entra ya ingreso en otra sustitucion (ARG-08) y la seleccion ya uso el maximo de 5 cambios.
+-- jugador que entra ya ingreso en otra sustitucion (ARG-08) y la seleccion ya uso los 5 cambios del tiempo reglamentario.
 BEGIN TRY
     EXEC Formacion.usp_Sustitucion_Alta @IdAlineacionSale = @Al07, @IdAlineacionEntra = @Al08,
          @Periodo = 'Segundo tiempo', @Minuto = 88, @Motivo = 'Tactico';
@@ -211,7 +212,7 @@ END CATCH
 
 PRINT '=== Prueba 15: sustitucion con periodo y motivo fuera del dominio ===';
 -- Resultado esperado: error 50001 con 2 condiciones: el periodo debe ser Primer tiempo, Segundo tiempo,
--- Alargue 1 o Alargue 2 ('SegundoTiempo' no es valido) y el motivo debe ser Tactico, Lesion u Otro ('Cansancio'
+-- Alargue 1 o Alargue 2 ('SegundoTiempo' no es valido) y el motivo debe ser Tactico, Lesion o Precaucion ('Cansancio'
 -- no es valido). Sale BRA-01 y entra BRA-12 (Brasil no uso cambios), asi que es lo unico que falla.
 BEGIN TRY
     EXEC Formacion.usp_Sustitucion_Alta @IdAlineacionSale = @AlBra01, @IdAlineacionEntra = @AlBra12,
@@ -224,10 +225,43 @@ END CATCH
 PRINT '=== Prueba 16: modificar una sustitucion con periodo y motivo fuera del dominio ===';
 -- Resultado esperado: error 50001 con 2 condiciones: el periodo debe ser Primer tiempo, Segundo tiempo,
 -- Alargue 1 o Alargue 2 ('Penales' no es valido: no hay cambios en la tanda) y el motivo debe ser Tactico,
--- Lesion u Otro ('Indisciplina' no es valido).
+-- Lesion o Precaucion ('Indisciplina' no es valido).
 BEGIN TRY
     EXEC Formacion.usp_Sustitucion_Modificacion @IdSustitucion = @IdSustC4, @Periodo = 'Penales', @Minuto = 85,
          @Motivo = 'Indisciplina';
+END TRY
+BEGIN CATCH
+    SELECT ERROR_NUMBER() AS Numero, ERROR_MESSAGE() AS Mensaje;
+END CATCH
+
+PRINT '=== Prueba 17: sexto cambio en una cuarta ventana del tiempo reglamentario ===';
+-- Resultado esperado: error 50001 con 2 condiciones: la seleccion ya uso los 5 cambios del tiempo reglamentario y
+-- las 3 ventanas de cambios del tiempo reglamentario (Argentina uso las ventanas 1, 2 y 3; la 4 solo corresponde a
+-- la prorroga).
+BEGIN TRY
+    EXEC Formacion.usp_Sustitucion_Alta @IdAlineacionSale = @Al19, @IdAlineacionEntra = @Al16,
+         @Periodo = 'Segundo tiempo', @Minuto = 88, @Motivo = 'Tactico', @NumeroVentana = 4;
+END TRY
+BEGIN CATCH
+    SELECT ERROR_NUMBER() AS Numero, ERROR_MESSAGE() AS Mensaje;
+END CATCH
+
+PRINT '=== Prueba 18: modificar una sustitucion a una cuarta ventana del tiempo reglamentario ===';
+-- Resultado esperado: error 50001 con 1 condicion: la seleccion ya uso las 3 ventanas de cambios del tiempo
+-- reglamentario (las otras sustituciones de Argentina usan las ventanas 1, 2 y 3).
+BEGIN TRY
+    EXEC Formacion.usp_Sustitucion_Modificacion @IdSustitucion = @IdSustC4, @Periodo = 'Segundo tiempo',
+         @Minuto = 80, @Motivo = 'Tactico', @NumeroVentana = 4;
+END TRY
+BEGIN CATCH
+    SELECT ERROR_NUMBER() AS Numero, ERROR_MESSAGE() AS Mensaje;
+END CATCH
+
+PRINT '=== Prueba 19: numero de ventana invalido en la prorroga ===';
+-- Resultado esperado: error 50001 con 1 condicion: el numero de ventana debe ser mayor o igual a 1.
+BEGIN TRY
+    EXEC Formacion.usp_Sustitucion_Modificacion @IdSustitucion = @IdSustC4, @Periodo = 'Alargue 1',
+         @Minuto = 100, @Motivo = 'Precaucion', @NumeroVentana = 0;
 END TRY
 BEGIN CATCH
     SELECT ERROR_NUMBER() AS Numero, ERROR_MESSAGE() AS Mensaje;

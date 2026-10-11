@@ -237,12 +237,15 @@ BEGIN
     SET NOCOUNT ON;
     SET XACT_ABORT ON;
 
-    DECLARE @maxCambios INT = 5;
+    -- 5 cambios y 3 ventanas en el tiempo reglamentario; la prorroga suma 1 cambio y 1 ventana mas
+    DECLARE @maxCambiosReglamentario INT = 5, @maxCambiosTotal INT = 6;
+    DECLARE @maxVentanasReglamentario INT = 3, @maxVentanasProrroga INT = 1;
     DECLARE @errores VARCHAR(2000) = '';
     DECLARE @saleExiste BIT = 0, @entraExiste BIT = 0;
     DECLARE @partidoSale INT, @selSale INT, @titSale BIT;
     DECLARE @partidoEntra INT, @selEntra INT, @titEntra BIT;
-    DECLARE @cambios INT;
+    DECLARE @cambiosReglamentario INT, @cambiosTotal INT, @ventanasGrupo INT, @ventanaUsada BIT;
+    DECLARE @esProrroga BIT = CASE WHEN @Periodo IN ('Alargue 1', 'Alargue 2') THEN 1 ELSE 0 END;
 
     SELECT @saleExiste = 1, @partidoSale = a.IdPartido, @selSale = j.IdSeleccion, @titSale = a.EsTitular
     FROM Formacion.Alineacion a
@@ -264,8 +267,11 @@ BEGIN
     IF @MinutoAdicional IS NULL OR @MinutoAdicional < 0
         SET @errores += 'El minuto adicional no puede ser negativo. ';
 
-    IF @Motivo IS NULL OR @Motivo NOT IN ('Tactico', 'Lesion', 'Otro')
-        SET @errores += 'El motivo debe ser Tactico, Lesion u Otro. ';
+    IF @NumeroVentana IS NOT NULL AND @NumeroVentana < 1
+        SET @errores += 'El numero de ventana debe ser mayor o igual a 1. ';
+
+    IF @Motivo IS NULL OR @Motivo NOT IN ('Tactico', 'Lesion', 'Precaucion')
+        SET @errores += 'El motivo debe ser Tactico, Lesion o Precaucion. ';
 
     -- Jugadores involucrados
     IF @saleExiste = 0
@@ -301,14 +307,36 @@ BEGIN
             IF EXISTS (SELECT 1 FROM Formacion.Sustitucion WHERE IdAlineacionEntra = @IdAlineacionEntra)
                 SET @errores += 'El jugador que entra ya ingreso en otra sustitucion. ';
 
-            SELECT @cambios = COUNT(*)
+            SELECT @cambiosTotal = COUNT(*),
+                   @cambiosReglamentario = ISNULL(SUM(CASE WHEN su.Periodo IN ('Alargue 1', 'Alargue 2') THEN 0 ELSE 1 END), 0)
             FROM Formacion.Sustitucion su
             JOIN Formacion.Alineacion asale ON asale.IdAlineacion = su.IdAlineacionSale
             JOIN Torneo.Jugador jsale       ON jsale.IdJugador = asale.IdJugador
             WHERE asale.IdPartido = @partidoSale AND jsale.IdSeleccion = @selSale;
 
-            IF @cambios >= @maxCambios
-                SET @errores += CONCAT('La seleccion ya uso el maximo de ', @maxCambios, ' cambios en este partido. ');
+            IF @esProrroga = 0 AND @cambiosReglamentario >= @maxCambiosReglamentario
+                SET @errores += CONCAT('La seleccion ya uso los ', @maxCambiosReglamentario, ' cambios del tiempo reglamentario (el sexto solo se permite en la prorroga). ');
+            ELSE IF @cambiosTotal >= @maxCambiosTotal
+                SET @errores += CONCAT('La seleccion ya uso el maximo de ', @maxCambiosTotal, ' cambios en este partido. ');
+
+            -- Ventanas distintas que la seleccion ya uso en el mismo tramo (reglamentario o prorroga)
+            IF @NumeroVentana IS NOT NULL
+            BEGIN
+                SELECT @ventanasGrupo = COUNT(DISTINCT su.NumeroVentana),
+                       @ventanaUsada = ISNULL(MAX(CASE WHEN su.NumeroVentana = @NumeroVentana THEN 1 ELSE 0 END), 0)
+                FROM Formacion.Sustitucion su
+                JOIN Formacion.Alineacion asale ON asale.IdAlineacion = su.IdAlineacionSale
+                JOIN Torneo.Jugador jsale       ON jsale.IdJugador = asale.IdJugador
+                WHERE asale.IdPartido = @partidoSale AND jsale.IdSeleccion = @selSale
+                  AND su.NumeroVentana IS NOT NULL
+                  AND CASE WHEN su.Periodo IN ('Alargue 1', 'Alargue 2') THEN 1 ELSE 0 END = @esProrroga;
+
+                IF @ventanaUsada = 0
+                   AND @ventanasGrupo >= CASE WHEN @esProrroga = 1 THEN @maxVentanasProrroga ELSE @maxVentanasReglamentario END
+                    SET @errores += CASE WHEN @esProrroga = 1
+                                         THEN 'La seleccion ya uso la ventana de cambios de la prorroga. '
+                                         ELSE CONCAT('La seleccion ya uso las ', @maxVentanasReglamentario, ' ventanas de cambios del tiempo reglamentario. ') END;
+            END;
         END
     END
 
@@ -347,9 +375,20 @@ BEGIN
     SET NOCOUNT ON;
     SET XACT_ABORT ON;
 
+    DECLARE @maxCambiosReglamentario INT = 5, @maxCambiosTotal INT = 6;
+    DECLARE @maxVentanasReglamentario INT = 3, @maxVentanasProrroga INT = 1;
     DECLARE @errores VARCHAR(2000) = '';
+    DECLARE @idPartido INT, @idSeleccion INT;
+    DECLARE @cambiosReglamentario INT, @cambiosTotal INT, @ventanasGrupo INT, @ventanaUsada BIT;
+    DECLARE @esProrroga BIT = CASE WHEN @Periodo IN ('Alargue 1', 'Alargue 2') THEN 1 ELSE 0 END;
 
-    IF NOT EXISTS (SELECT 1 FROM Formacion.Sustitucion WHERE IdSustitucion = @IdSustitucion)
+    SELECT @idPartido = a.IdPartido, @idSeleccion = j.IdSeleccion
+    FROM Formacion.Sustitucion su
+    JOIN Formacion.Alineacion a ON a.IdAlineacion = su.IdAlineacionSale
+    JOIN Torneo.Jugador j       ON j.IdJugador = a.IdJugador
+    WHERE su.IdSustitucion = @IdSustitucion;
+
+    IF @idPartido IS NULL
         SET @errores += 'La sustitucion indicada no existe. ';
 
     IF @Periodo IS NULL OR @Periodo NOT IN ('Primer tiempo', 'Segundo tiempo', 'Alargue 1', 'Alargue 2')
@@ -361,8 +400,47 @@ BEGIN
     IF @MinutoAdicional IS NULL OR @MinutoAdicional < 0
         SET @errores += 'El minuto adicional no puede ser negativo. ';
 
-    IF @Motivo IS NULL OR @Motivo NOT IN ('Tactico', 'Lesion', 'Otro')
-        SET @errores += 'El motivo debe ser Tactico, Lesion u Otro. ';
+    IF @NumeroVentana IS NOT NULL AND @NumeroVentana < 1
+        SET @errores += 'El numero de ventana debe ser mayor o igual a 1. ';
+
+    IF @Motivo IS NULL OR @Motivo NOT IN ('Tactico', 'Lesion', 'Precaucion')
+        SET @errores += 'El motivo debe ser Tactico, Lesion o Precaucion. ';
+
+    -- Mismos limites que el alta, sin contar la propia sustitucion
+    IF @idPartido IS NOT NULL
+    BEGIN
+        SELECT @cambiosTotal = COUNT(*),
+               @cambiosReglamentario = ISNULL(SUM(CASE WHEN su.Periodo IN ('Alargue 1', 'Alargue 2') THEN 0 ELSE 1 END), 0)
+        FROM Formacion.Sustitucion su
+        JOIN Formacion.Alineacion asale ON asale.IdAlineacion = su.IdAlineacionSale
+        JOIN Torneo.Jugador jsale       ON jsale.IdJugador = asale.IdJugador
+        WHERE asale.IdPartido = @idPartido AND jsale.IdSeleccion = @idSeleccion
+          AND su.IdSustitucion <> @IdSustitucion;
+
+        IF @esProrroga = 0 AND @cambiosReglamentario >= @maxCambiosReglamentario
+            SET @errores += CONCAT('La seleccion ya uso los ', @maxCambiosReglamentario, ' cambios del tiempo reglamentario (el sexto solo se permite en la prorroga). ');
+        ELSE IF @cambiosTotal >= @maxCambiosTotal
+            SET @errores += CONCAT('La seleccion ya uso el maximo de ', @maxCambiosTotal, ' cambios en este partido. ');
+
+        IF @NumeroVentana IS NOT NULL
+        BEGIN
+            SELECT @ventanasGrupo = COUNT(DISTINCT su.NumeroVentana),
+                   @ventanaUsada = ISNULL(MAX(CASE WHEN su.NumeroVentana = @NumeroVentana THEN 1 ELSE 0 END), 0)
+            FROM Formacion.Sustitucion su
+            JOIN Formacion.Alineacion asale ON asale.IdAlineacion = su.IdAlineacionSale
+            JOIN Torneo.Jugador jsale       ON jsale.IdJugador = asale.IdJugador
+            WHERE asale.IdPartido = @idPartido AND jsale.IdSeleccion = @idSeleccion
+              AND su.IdSustitucion <> @IdSustitucion
+              AND su.NumeroVentana IS NOT NULL
+              AND CASE WHEN su.Periodo IN ('Alargue 1', 'Alargue 2') THEN 1 ELSE 0 END = @esProrroga;
+
+            IF @ventanaUsada = 0
+               AND @ventanasGrupo >= CASE WHEN @esProrroga = 1 THEN @maxVentanasProrroga ELSE @maxVentanasReglamentario END
+                SET @errores += CASE WHEN @esProrroga = 1
+                                     THEN 'La seleccion ya uso la ventana de cambios de la prorroga. '
+                                     ELSE CONCAT('La seleccion ya uso las ', @maxVentanasReglamentario, ' ventanas de cambios del tiempo reglamentario. ') END;
+        END;
+    END;
 
     IF @errores <> ''
         THROW 50001, @errores, 1;

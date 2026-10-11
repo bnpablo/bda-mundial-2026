@@ -172,4 +172,15 @@ JOIN Formacion.Alineacion aen ON aen.IdAlineacion = su.IdAlineacionEntra
 JOIN Torneo.Jugador je        ON je.IdJugador = aen.IdJugador
 WHERE asa.IdPartido = @IdP3
 ORDER BY su.IdSustitucion;
+
+PRINT '=== Prueba 8: sexto cambio de Argentina en la prorroga ===';
+-- Resultado esperado: el sexto cambio solo se admite en la prorroga y en una ventana propia: sale ARG-19 y entra
+-- ARG-16 en el minuto 100 (Alargue 1, ventana 4, motivo Precaucion), con lo que hay 6 sustituciones. Se elimina a
+-- continuacion y vuelven a ser 5, que es el estado que esperan los tests siguientes.
+EXEC Formacion.usp_Sustitucion_Alta @IdAlineacionSale = @Al19, @IdAlineacionEntra = @Al16,
+     @Periodo = 'Alargue 1', @Minuto = 100, @Motivo = 'Precaucion', @NumeroVentana = 4,
+     @IdSustitucion = @IdSustTemp OUTPUT;
+SELECT COUNT(*) AS SustitucionesConProrroga FROM Formacion.Sustitucion;
+EXEC Formacion.usp_Sustitucion_Baja @IdSustitucion = @IdSustTemp;
+SELECT COUNT(*) AS SustitucionesSinProrroga FROM Formacion.Sustitucion;
 GO

@@ -167,7 +167,7 @@ GO
  Un cambio solo se registra con el partido En juego, con los dos jugadores en la
  alineacion del partido, y con un periodo y un motivo validos (los del CHECK de
  Sustitucion). Las demas reglas (suplente que entra, titular o ingresado
- que sale, maximo de 5 cambios, etc.) son las de usp_Sustitucion_Alta.
+ que sale, maximo de cambios y de ventanas, etc.) son las de usp_Sustitucion_Alta.
 ------------------------------------------------------------------------------*/
 CREATE OR ALTER PROCEDURE Formacion.usp_RegistrarCambio
     @IdPartido       INT,
@@ -211,8 +211,8 @@ BEGIN
     IF @Periodo IS NULL OR @Periodo NOT IN ('Primer tiempo', 'Segundo tiempo', 'Alargue 1', 'Alargue 2')
         SET @errores += 'El periodo debe ser Primer tiempo, Segundo tiempo, Alargue 1 o Alargue 2. ';
 
-    IF @Motivo IS NULL OR @Motivo NOT IN ('Tactico', 'Lesion', 'Otro')
-        SET @errores += 'El motivo debe ser Tactico, Lesion u Otro. ';
+    IF @Motivo IS NULL OR @Motivo NOT IN ('Tactico', 'Lesion', 'Precaucion')
+        SET @errores += 'El motivo debe ser Tactico, Lesion o Precaucion. ';
 
     IF @errores <> ''
         THROW 50001, @errores, 1;

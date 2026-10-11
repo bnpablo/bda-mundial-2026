@@ -194,7 +194,7 @@ END CATCH
 
 PRINT '=== Prueba 12: cambio con periodo y motivo fuera del dominio ===';
 -- Resultado esperado: error 50001 con 2 condiciones: el periodo debe ser Primer tiempo, Segundo tiempo,
--- Alargue 1 o Alargue 2 ('Penales' no es valido) y el motivo debe ser Tactico, Lesion u Otro ('Cansancio' no es
+-- Alargue 1 o Alargue 2 ('Penales' no es valido) y el motivo debe ser Tactico, Lesion o Precaucion ('Cansancio' no es
 -- valido). Los jugadores (ARG-06 titular y ARG-14 suplente) y el partido 5 son validos.
 BEGIN TRY
     EXEC Formacion.usp_RegistrarCambio @IdPartido = @IdP5, @IdJugadorSale = @Arg06, @IdJugadorEntra = @Arg14,
