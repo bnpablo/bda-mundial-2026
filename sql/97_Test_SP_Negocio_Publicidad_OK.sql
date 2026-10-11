@@ -4,13 +4,15 @@
  Comision     : 02-5600 | Grupo N° 4
  Integrantes  : Avila, Agustin | Blanco, Pablo | Leopaldi, Agustin | Sosa, Jesus
  Fecha        : 2026-10-11
- Script       : 96_Test_SP_Negocio_Publicidad_OK.sql
- Objetivo     : Testing exitoso de 95_SP_Negocio_Publicidad.sql (relacion 1:1) y de las
-                funciones de 07_Funciones_Publicidad.sql. Recorre el ciclo completo
+ Script       : 97_Test_SP_Negocio_Publicidad_OK.sql
+ Objetivo     : Testing exitoso de 96_SP_Negocio_Publicidad.sql (relacion 1:1) y de las
+                funciones de 70_Funciones_Publicidad.sql. Recorre el ciclo completo
                 en INC-P2 (Ecuador - Uruguay, grupos, 19/06/2026 18:00 UTC):
                 simulacion de prime time, propuesta de las 4 piezas, venta de dos
                 espacios, fin del partido y registro de la exhibicion.
- Requisito    : ejecutar despues de 94_Test_SP_ABM_Publicidad_Validaciones.sql.
+ Requisito    : ejecutar despues de 62_Test_SP_ABM_Publicidad_Validaciones.sql (y de lo que
+                requieren los tests 61 y 62: Torneo, Formacion y Arbitraje e Incidencia
+                cargados).
 ==============================================================================*/
 USE MundialDB;
 GO
@@ -19,7 +21,7 @@ SET NOCOUNT ON;
 
 /*------------------------------------------------------------------------------
  PREPARACION DE DATOS
- Se carga el PIB per capita de los mercados con el SP de Pablo (modificacion
+ Se carga el PIB per capita de los mercados con Torneo.usp_Pais_Modificacion (modificacion
  completa: se reenvian los demas datos del pais como estan). Colombia y
  Ecuador quedan sin PIB.
 ------------------------------------------------------------------------------*/
@@ -114,7 +116,7 @@ FROM Publicidad.PublicidadPartido WHERE IdPartido = @IdP2;
 ------------------------------------------------------------------------------*/
 PRINT '=== Prueba 6: registro de la exhibicion ===';
 -- Resultado esperado: se venden los espacios 1 y 2 (Propuesta -> Confirmada, con el ABM). El partido se
--- finaliza con el SP de Pablo. Al registrar la exhibicion: Exhibidas = 2 (espacios 1 y 2) y Descartadas = 2
+-- finaliza con Torneo.usp_FinalizarPartido. Al registrar la exhibicion: Exhibidas = 2 (espacios 1 y 2) y Descartadas = 2
 -- (espacios 3 y 4, que no se vendieron). Ingresos del partido: 2 x 55000 = USD 110000.
 SET @Espacio1 = (SELECT IdPublicidadPartido FROM Publicidad.PublicidadPartido WHERE IdPartido = @IdP2 AND NumeroEspacio = 1);
 SET @Espacio2 = (SELECT IdPublicidadPartido FROM Publicidad.PublicidadPartido WHERE IdPartido = @IdP2 AND NumeroEspacio = 2);

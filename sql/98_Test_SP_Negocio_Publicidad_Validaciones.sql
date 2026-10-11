@@ -4,12 +4,12 @@
  Comision     : 02-5600 | Grupo N° 4
  Integrantes  : Avila, Agustin | Blanco, Pablo | Leopaldi, Agustin | Sosa, Jesus
  Fecha        : 2026-10-11
- Script       : 97_Test_SP_Negocio_Publicidad_Validaciones.sql
- Objetivo     : Testing de las validaciones de 95_SP_Negocio_Publicidad.sql (relacion
+ Script       : 98_Test_SP_Negocio_Publicidad_Validaciones.sql
+ Objetivo     : Testing de las validaciones de 96_SP_Negocio_Publicidad.sql (relacion
                 1:1). Cada caso invalido se ejecuta dentro de TRY/CATCH: muestra el
                 numero de error y el mensaje unico que agrupa todas las condiciones
                 que no se cumplen.
- Requisito    : ejecutar despues de 96_Test_SP_Negocio_Publicidad_OK.sql. Estado:
+ Requisito    : ejecutar despues de 97_Test_SP_Negocio_Publicidad_OK.sql. Estado:
                 INC-P0 y INC-P2 Finalizados (INC-P2 con 2 espacios Exhibidos y 2
                 Descartados), INC-P5 En juego (Cuartos, sin tarifa) e INC-P6
                 Programado sin espacios.
@@ -82,7 +82,7 @@ END CATCH
 
 PRINT '=== Prueba 6: registrar dos veces la exhibicion ===';
 -- Resultado esperado: error 50001: "El partido no tiene espacios propuestos ni confirmados para cerrar."
--- (INC-P2 ya se cerro en el script 96).
+-- (INC-P2 ya se cerro en el script 97).
 BEGIN TRY
     EXEC Publicidad.usp_RegistrarExhibicion @IdPartido = @IdP2;
 END TRY
