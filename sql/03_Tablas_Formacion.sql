@@ -29,7 +29,7 @@ CREATE TABLE Formacion.Alineacion (
     IdPartido       int NOT NULL,
     IdJugador       int NOT NULL,
     EsTitular       bit NOT NULL,
-    PosicionCancha  varchar(10) NOT NULL, -- No utilizamos el nombre de mediocampista, sino de volante.
+    PosicionCancha  varchar(10) NOT NULL,
     CONSTRAINT PK_Alineacion PRIMARY KEY CLUSTERED (IdAlineacion),
     CONSTRAINT FK_Alineacion_Partido FOREIGN KEY (IdPartido) REFERENCES Torneo.Partido(IdPartido),
     CONSTRAINT FK_Alineacion_Jugador FOREIGN KEY (IdJugador) REFERENCES Torneo.Jugador(IdJugador),

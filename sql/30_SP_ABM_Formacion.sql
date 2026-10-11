@@ -78,7 +78,8 @@ BEGIN
 
         IF @pertenece = 1
         BEGIN
-            -- COUNT nunca devuelve NULL, por eso no hace falta ISNULL
+            -- SUM devuelve NULL cuando la seleccion todavia no tiene filas, por eso lleva ISNULL.
+            -- COUNT(*) devuelve 0 en ese caso y no lo necesita.
             SELECT @titulares = ISNULL(SUM(CASE WHEN a.EsTitular = 1 THEN 1 ELSE 0 END), 0),
                    @convocados = COUNT(*)
             FROM Formacion.Alineacion a
