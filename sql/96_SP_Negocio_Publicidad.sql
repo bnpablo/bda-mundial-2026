@@ -4,7 +4,7 @@
  Comision     : 02-5600 | Grupo N° 4
  Integrantes  : Avila, Agustin | Blanco, Pablo | Leopaldi, Agustin | Sosa, Jesus
  Fecha        : 2026-10-11
- Script       : 95_SP_Negocio_Publicidad.sql
+ Script       : 96_SP_Negocio_Publicidad.sql
  Objetivo     : Logica de negocio de publicidad. Cada SP valida todo primero (un
                 unico mensaje) y despues opera dentro de una transaccion:
                   Publicidad.usp_AsignarPiezasPartido  propone las 4 piezas de un
@@ -14,7 +14,7 @@
                                                        confirmado pasa a Exhibida
                                                        (para facturar) y lo propuesto
                                                        a Descartada.
- Prerrequisito: 92_SP_ABM_Publicidad.sql.
+ Prerrequisito: 60_SP_ABM_Publicidad.sql.
 ==============================================================================*/
 USE MundialDB;
 GO
