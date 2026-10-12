@@ -4,7 +4,7 @@
  Comision     : 02-5600 | Grupo N° 4
  Integrantes  : Avila, Agustin | Blanco, Pablo | Leopaldi, Agustin | Sosa, Jesus
  Fecha        : 2026-10-11
- Script       : 70_Funciones_Publicidad.sql
+ Script       : 59_Funciones_Publicidad.sql
  Objetivo     : Funciones de publicidad:
                   Publicidad.fn_HoraLocalMercado   hora del partido en un mercado (pais).
                   Publicidad.fn_EsPrimeTime        si esa hora cae en prime time.

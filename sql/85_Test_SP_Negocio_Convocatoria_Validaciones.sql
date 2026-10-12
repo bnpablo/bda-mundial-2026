@@ -27,7 +27,7 @@ DECLARE @IdBra06 INT = (SELECT IdJugador FROM Torneo.Jugador WHERE CodigoExterno
 DECLARE @IdArg26 INT = (SELECT IdJugador FROM Torneo.Jugador WHERE CodigoExterno = 'ARG-26');
 
 SELECT (SELECT COUNT(*) FROM Torneo.Seleccion) AS Selecciones, (SELECT COUNT(*) FROM Torneo.CuerpoTecnico) AS CuerpoTecnico,
-       (SELECT COUNT(*) FROM Torneo.Jugador WHERE IdSeleccion = @SelBra AND FechaBaja IS NULL) AS ConvocadosBrasil;   -- esperado: 6, 2, 23
+       (SELECT COUNT(*) FROM Torneo.Jugador WHERE IdSeleccion = @SelBra AND FechaBaja IS NULL) AS ConvocadosBrasil;   -- esperado: 9, 4, 23
 
 /*------------------------------------------------------------------------------
  REGISTRAR SELECCION
@@ -53,7 +53,7 @@ END TRY
 BEGIN CATCH
     SELECT ERROR_NUMBER() AS Numero, ERROR_MESSAGE() AS Mensaje;
 END CATCH
-SELECT (SELECT COUNT(*) FROM Torneo.Seleccion) AS Selecciones, (SELECT COUNT(*) FROM Torneo.CuerpoTecnico) AS CuerpoTecnico;   -- esperado: 6, 2
+SELECT (SELECT COUNT(*) FROM Torneo.Seleccion) AS Selecciones, (SELECT COUNT(*) FROM Torneo.CuerpoTecnico) AS CuerpoTecnico;   -- esperado: 9, 4
 
 /*------------------------------------------------------------------------------
  BAJA Y REEMPLAZO
@@ -163,5 +163,5 @@ BEGIN CATCH
 END CATCH
 
 SELECT (SELECT COUNT(*) FROM Torneo.Seleccion) AS Selecciones, (SELECT COUNT(*) FROM Torneo.CuerpoTecnico) AS CuerpoTecnico,
-       (SELECT COUNT(*) FROM Torneo.Jugador WHERE IdSeleccion = @SelBra AND FechaBaja IS NULL) AS ConvocadosBrasil;   -- esperado: 6, 2, 23
+       (SELECT COUNT(*) FROM Torneo.Jugador WHERE IdSeleccion = @SelBra AND FechaBaja IS NULL) AS ConvocadosBrasil;   -- esperado: 9, 4, 23
 GO
