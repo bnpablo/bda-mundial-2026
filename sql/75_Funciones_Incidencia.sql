@@ -12,6 +12,8 @@
                   Incidencia.fn_JugadorEnCancha     si un jugador estaba en cancha.
                   Incidencia.fn_JugadorSuspendido   si un jugador esta suspendido.
                   Incidencia.fn_SuspendidosPartido  suspendidos para un partido.
+                  Incidencia.fn_TablaGoleadores     goleadores del torneo o de una seleccion.
+                  Incidencia.fn_TarjetasPorSeleccion  tarjetas de cada seleccion.
                 Los criterios de suspension son parametros de las funciones, con el
                 valor del reglamento por defecto (no hace falta una tabla de
                 configuracion ni modificar el DER).
@@ -278,4 +280,56 @@ RETURN
       AND j.FechaBaja IS NULL
       AND Incidencia.fn_JugadorSuspendido(j.IdJugador, p.IdPartido, @AmarillasParaSuspension,
                                           @PartidosSuspensionRoja, @FaseReinicioAmarillas) = 1;
+GO
+
+/*------------------------------------------------------------------------------
+ Incidencia.fn_TablaGoleadores
+ Goles de cada jugador, del torneo (@IdSeleccion NULL) o de una seleccion. No
+ cuentan los goles en contra (suman para el rival) ni los de la definicion por
+ penales. GolesDePenal es la parte de Goles convertida de penal. Ejemplo:
+   SELECT * FROM Incidencia.fn_TablaGoleadores(NULL) ORDER BY Goles DESC, Apellido
+------------------------------------------------------------------------------*/
+CREATE OR ALTER FUNCTION Incidencia.fn_TablaGoleadores (@IdSeleccion INT = NULL)
+RETURNS TABLE
+AS
+RETURN
+    SELECT j.IdJugador, j.CodigoExterno, j.Nombre, j.Apellido, s.IdSeleccion, pa.Nombre AS Pais,
+           COUNT(*) AS Goles,
+           SUM(CASE WHEN g.TipoGol = 'Penal' THEN 1 ELSE 0 END) AS GolesDePenal
+    FROM Incidencia.Gol g
+    JOIN Formacion.Alineacion a ON a.IdAlineacion = g.IdAlineacionAutor
+    JOIN Torneo.Jugador j       ON j.IdJugador = a.IdJugador
+    JOIN Torneo.Seleccion s     ON s.IdSeleccion = j.IdSeleccion
+    JOIN Torneo.Pais pa         ON pa.IdPais = s.IdPais
+    WHERE g.TipoGol <> 'En contra'
+      AND g.Periodo <> 'Penales'
+      AND (@IdSeleccion IS NULL OR s.IdSeleccion = @IdSeleccion)
+    GROUP BY j.IdJugador, j.CodigoExterno, j.Nombre, j.Apellido, s.IdSeleccion, pa.Nombre;
+GO
+
+/*------------------------------------------------------------------------------
+ Incidencia.fn_TarjetasPorSeleccion
+ Amarillas, rojas directas y rojas por doble amarilla de cada seleccion, contando
+ jugadores y cuerpo tecnico. Incluye las selecciones sin tarjetas (en 0). Ejemplo:
+   SELECT * FROM Incidencia.fn_TarjetasPorSeleccion() ORDER BY Amarillas DESC
+------------------------------------------------------------------------------*/
+CREATE OR ALTER FUNCTION Incidencia.fn_TarjetasPorSeleccion ()
+RETURNS TABLE
+AS
+RETURN
+    SELECT s.IdSeleccion, pa.Nombre AS Pais,
+           SUM(CASE WHEN x.TipoTarjeta = 'Amarilla' THEN 1 ELSE 0 END) AS Amarillas,
+           SUM(CASE WHEN x.TipoTarjeta = 'Roja directa' THEN 1 ELSE 0 END) AS RojasDirectas,
+           SUM(CASE WHEN x.TipoTarjeta = 'Roja por doble amarilla' THEN 1 ELSE 0 END) AS RojasPorDobleAmarilla
+    FROM Torneo.Seleccion s
+    JOIN Torneo.Pais pa ON pa.IdPais = s.IdPais
+    LEFT JOIN (SELECT j.IdSeleccion, t.TipoTarjeta
+               FROM Incidencia.Tarjeta t
+               JOIN Formacion.Alineacion a ON a.IdAlineacion = t.IdAlineacion
+               JOIN Torneo.Jugador j       ON j.IdJugador = a.IdJugador
+               UNION ALL
+               SELECT ct.IdSeleccion, t.TipoTarjeta
+               FROM Incidencia.Tarjeta t
+               JOIN Torneo.CuerpoTecnico ct ON ct.IdCuerpoTecnico = t.IdCuerpoTecnico) x ON x.IdSeleccion = s.IdSeleccion
+    GROUP BY s.IdSeleccion, pa.Nombre;
 GO

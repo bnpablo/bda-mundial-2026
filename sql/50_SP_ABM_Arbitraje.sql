@@ -12,6 +12,11 @@
                 selecciones del partido) se informa aparte con el error 50002.
                 La modificacion es completa: se envian todos los datos y se
                 reemplazan todos.
+                La designacion de este script controla el rol y la nacionalidad. El
+                margen entre partidos del mismo arbitro y la advertencia de las fases
+                eliminatorias estan en 93_SP_Negocio_DesignacionArbitral.sql.
+                Arbitraje.fn_HistorialArbitro consulta los partidos arbitrados por un
+                arbitro, con el informe post-partido y la sancion de cada uno.
  Prerrequisito: 04_Tablas_Arbitraje_Incidencia.sql.
 ==============================================================================*/
 USE MundialDB;
@@ -493,4 +498,28 @@ BEGIN
         THROW;
     END CATCH
 END
+GO
+
+/*------------------------------------------------------------------------------
+ HISTORIAL DE UN ARBITRO
+ Arbitraje.fn_HistorialArbitro
+ Partidos en los que el arbitro fue designado, con el rol, el informe
+ post-partido y la sancion. Las selecciones del partido pueden ser NULL (cruce
+ por definir). Ejemplo:
+   SELECT * FROM Arbitraje.fn_HistorialArbitro(@IdArbitro) ORDER BY FechaHoraUtc
+------------------------------------------------------------------------------*/
+CREATE OR ALTER FUNCTION Arbitraje.fn_HistorialArbitro (@IdArbitro INT)
+RETURNS TABLE
+AS
+RETURN
+    SELECT d.IdDesignacion, p.IdPartido, p.NumeroPartido, p.Fase, p.FechaHoraUtc, p.Estado,
+           pl.Nombre AS Local, pv.Nombre AS Visitante,
+           d.RolArbitral, d.InformePostPartido, d.Sancion
+    FROM Arbitraje.DesignacionArbitral d
+    JOIN Torneo.Partido p        ON p.IdPartido = d.IdPartido
+    LEFT JOIN Torneo.Seleccion sl ON sl.IdSeleccion = p.IdSeleccionLocal
+    LEFT JOIN Torneo.Pais pl      ON pl.IdPais = sl.IdPais
+    LEFT JOIN Torneo.Seleccion sv ON sv.IdSeleccion = p.IdSeleccionVisitante
+    LEFT JOIN Torneo.Pais pv      ON pv.IdPais = sv.IdPais
+    WHERE d.IdArbitro = @IdArbitro;
 GO
