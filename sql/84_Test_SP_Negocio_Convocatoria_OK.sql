@@ -8,7 +8,7 @@
  Objetivo     : Testing exitoso de 83_SP_Negocio_Convocatoria.sql (relacion 1:1):
                 registrar una seleccion con su director tecnico, una baja de ultimo
                 momento con reemplazo y una baja sin reemplazo.
- Requisito    : ejecutar despues de 82_Test_SP_Negocio_Partidos_Validaciones.sql (usa las
+ Requisito    : ejecutar despues de 42_Test_SP_Negocio_Partidos_Validaciones.sql (usa las
                 selecciones de Argentina, con 26 convocados, y de Brasil, con 23).
 ==============================================================================*/
 USE MundialDB;
@@ -25,7 +25,7 @@ DECLARE @IdBajaSinReemplazo INT = (SELECT IdJugador FROM Torneo.Jugador WHERE Co
 
 SELECT (SELECT COUNT(*) FROM Torneo.Seleccion) AS Selecciones, (SELECT COUNT(*) FROM Torneo.CuerpoTecnico) AS CuerpoTecnico,
        (SELECT COUNT(*) FROM Torneo.Jugador WHERE IdSeleccion = @SelArg AND FechaBaja IS NULL) AS ConvocadosArgentina,
-       (SELECT COUNT(*) FROM Torneo.Jugador WHERE IdSeleccion = @SelBra AND FechaBaja IS NULL) AS ConvocadosBrasil;   -- esperado: 5, 1, 26, 23
+       (SELECT COUNT(*) FROM Torneo.Jugador WHERE IdSeleccion = @SelBra AND FechaBaja IS NULL) AS ConvocadosBrasil;   -- esperado: 8, 3, 26, 23 (incluye lo que cargan los tests 21 y 51)
 
 PRINT '=== Prueba 1: registrar una seleccion con su director tecnico ===';
 -- Resultado esperado: en una sola operacion se crean la seleccion de Espana (grupo F) y su director tecnico Luis
@@ -35,7 +35,7 @@ EXEC Torneo.usp_RegistrarSeleccion @CodigoExterno = 'SEL-ESP', @IdPais = @PaisEs
      @NombreDirector = 'Luis', @ApellidoDirector = 'de la Fuente', @IdSeleccion = @IdSelEsp OUTPUT, @IdDirector = @IdDirector OUTPUT;
 SELECT s.IdSeleccion, s.CodigoExterno, s.Grupo, c.Nombre, c.Apellido, c.Rol
 FROM Torneo.Seleccion s JOIN Torneo.CuerpoTecnico c ON c.IdSeleccion = s.IdSeleccion WHERE s.IdSeleccion = @IdSelEsp;
-SELECT (SELECT COUNT(*) FROM Torneo.Seleccion) AS Selecciones, (SELECT COUNT(*) FROM Torneo.CuerpoTecnico) AS CuerpoTecnico;   -- esperado: 6, 2
+SELECT (SELECT COUNT(*) FROM Torneo.Seleccion) AS Selecciones, (SELECT COUNT(*) FROM Torneo.CuerpoTecnico) AS CuerpoTecnico;   -- esperado: 9, 4
 
 PRINT '=== Prueba 2: baja de ultimo momento con reemplazo ===';
 -- Resultado esperado: el defensor BRA-05 queda dado de baja por lesion el 01/06 y su reemplazo BRA-24 (defensor,
