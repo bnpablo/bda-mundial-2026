@@ -237,4 +237,20 @@ EXEC Incidencia.usp_RegistrarTarjeta @IdPartido = @IdP3, @IdAlineacion = @P3Ury0
      @Periodo = 'Primer tiempo', @Minuto = 5;
 SELECT 'Reinicio en Octavos: URY-03 en P4' AS Caso,
        Incidencia.fn_JugadorSuspendido(@Ury03, @IdP4, DEFAULT, DEFAULT, 'Octavos') AS Suspendido, 1 AS Esperado;
+
+PRINT '=== Prueba 17: tabla de goleadores del torneo y de una seleccion ===';
+-- Resultado esperado: el torneo tiene 3 goleadores con 1 gol cada uno, ninguno de penal: ECU-01, URY-01 y URY-03.
+-- La segunda consulta, filtrada por la seleccion de Ecuador, devuelve solo ECU-01.
+SELECT Pais, CodigoExterno, Goles, GolesDePenal FROM Incidencia.fn_TablaGoleadores(NULL) ORDER BY Goles DESC, CodigoExterno;
+SELECT Pais, CodigoExterno, Goles, GolesDePenal
+FROM Incidencia.fn_TablaGoleadores((SELECT IdSeleccion FROM Torneo.Seleccion WHERE CodigoExterno = 'SEL-ECU'))
+ORDER BY Goles DESC, CodigoExterno;
+
+PRINT '=== Prueba 18: tarjetas por seleccion ===';
+-- Resultado esperado: Colombia 1 amarilla y 1 roja directa; Ecuador 2 amarillas y 1 roja por doble amarilla;
+-- Uruguay 9 amarillas y 1 roja por doble amarilla (15 tarjetas en total, contando jugadores y cuerpo tecnico).
+SELECT Pais, Amarillas, RojasDirectas, RojasPorDobleAmarilla
+FROM Incidencia.fn_TarjetasPorSeleccion()
+WHERE Pais IN ('Uruguay', 'Colombia', 'Ecuador')
+ORDER BY Pais;
 GO

@@ -234,4 +234,12 @@ PRINT '=== Prueba 9: baja de un arbitro sin designaciones ===';
 EXEC Arbitraje.usp_Arbitro_Baja @IdArbitro = @ArbNed;
 SELECT (SELECT COUNT(*) FROM Arbitraje.Arbitro WHERE IdArbitro = @ArbNed) AS Arbitros,
        (SELECT COUNT(*) FROM Arbitraje.ArbitroIdioma WHERE IdArbitro = @ArbNed) AS Idiomas;
+
+PRINT '=== Prueba 10: historial de un arbitro ===';
+-- Resultado esperado: 2 partidos de Silva, en orden cronologico: INC-P0 (101, Colombia contra Ecuador,
+-- Finalizado) como Principal, con su informe, e INC-P1 (102, Uruguay contra Colombia, Programado) como Cuarto
+-- arbitro, sin informe ni sancion.
+SELECT h.NumeroPartido, h.Fase, h.Estado, h.Local, h.Visitante, h.RolArbitral, h.InformePostPartido, h.Sancion
+FROM Arbitraje.fn_HistorialArbitro(@ArbPor) h
+ORDER BY h.FechaHoraUtc;
 GO
