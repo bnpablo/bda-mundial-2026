@@ -4,8 +4,8 @@
  Comision     : 02-5600 | Grupo N° 4
  Integrantes  : Avila, Agustin | Blanco, Pablo | Leopaldi, Agustin | Sosa, Jesus
  Fecha        : 2026-10-11
- Script       : 91_Test_SP_Incidencia_OK.sql
- Objetivo     : Testing exitoso de 90_SP_Incidencia.sql (relacion 1:1) y del calculo
+ Script       : 77_Test_SP_Incidencia_OK.sql
+ Objetivo     : Testing exitoso de 76_SP_Incidencia.sql (relacion 1:1) y del calculo
                 de suspensiones de 75_Funciones_Incidencia.sql. Cubre los casos
                 obligatorios: partido con doble amarilla, partido con roja directa y
                 jugador suspendido por acumulacion para el partido siguiente.
@@ -13,7 +13,7 @@
                 P4 (Octavos) y P5 (Cuartos). Colombia juega P1 y P3; Ecuador P2, P4 y P5.
  Requisito    : ejecutar despues de 52_Test_SP_ABM_Arbitraje_Validaciones.sql (usa los
                 partidos y jugadores que prepara el script 51), de 30_SP_ABM_Formacion.sql
-                (alineaciones y sustitucion) y de 80_SP_Negocio_Partidos.sql (inicia
+                (alineaciones y sustitucion) y de 40_SP_Negocio_Partidos.sql (inicia
                 P1 a P5).
 ==============================================================================*/
 USE MundialDB;

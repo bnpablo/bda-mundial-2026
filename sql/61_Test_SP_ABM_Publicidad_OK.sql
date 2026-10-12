@@ -16,11 +16,11 @@
                     Telefonia Global    Spot Estados Unidos (USA)
                     Deportes del Norte  Spot Portugal (POR)
                   Tarifas: Grupos (junio, USD 55000) y Tercer puesto (julio, USD 80000).
- Requisito    : ejecutar despues de los scripts de Torneo (01, 02, 10..12, 20..22, 80..85),
-                de Formacion (03, 30..32) y de Arbitraje e Incidencia (04, 75, 50..52,
-                90..92), en ese orden: los tests usan las tablas y los SP de esos
-                modulos y los paises y partidos INC-P que cargan sus tests. Despues de
-                60_SP_ABM_Publicidad.sql. Una sola vez.
+ Requisito    : ejecutar despues de los scripts de Torneo (01, 02, 10..12, 20..22,
+                40..42, 83..85), de Formacion (03, 30..32) y de Arbitraje (04, 50..52),
+                en ese orden: los tests usan las tablas y los SP de esos modulos y los
+                paises y partidos INC-P que cargan los tests 51 y 52. Despues de
+                59_Funciones_Publicidad.sql y 60_SP_ABM_Publicidad.sql. Una sola vez.
 ==============================================================================*/
 USE MundialDB;
 GO

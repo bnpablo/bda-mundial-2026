@@ -10,7 +10,7 @@
                 informa en un unico mensaje todas las validaciones que no se
                 cumplen. La modificacion es completa: se envian todos los datos y
                 se reemplazan todos.
- Prerrequisito: 70_Funciones_Publicidad.sql.
+ Prerrequisito: 59_Funciones_Publicidad.sql.
 ==============================================================================*/
 USE MundialDB;
 GO

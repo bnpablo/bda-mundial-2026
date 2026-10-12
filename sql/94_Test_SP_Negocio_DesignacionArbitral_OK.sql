@@ -13,7 +13,7 @@
  Requisito    : ejecutar despues de 88_Test_SP_Negocio_Alineaciones_Validaciones.sql y
                 de 52 (tests de Arbitraje), una sola vez. Usa los paises Estados Unidos,
                 Espana y Mexico, las selecciones de Argentina, Brasil, Francia y Mexico y
-                las sedes MetLife y SoFi, que cargan los scripts 11, 21, 81 y 84.
+                las sedes MetLife y SoFi, que cargan los scripts 11, 21, 41 y 84.
  Supuestos    : Arbitraje.usp_Arbitro_Alta (50_SP_ABM_Arbitraje.sql) recibe @CodigoExterno,
                 @Nombre, @Apellido, @FechaNacimiento, @IdPais y @Categoria, y devuelve el
                 id en @IdArbitro OUTPUT. La categoria (FIFA o Confederacion) y los roles

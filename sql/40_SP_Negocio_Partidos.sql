@@ -4,7 +4,7 @@
  Comision     : 02-5600 | Grupo N° 4
  Integrantes  : Avila, Agustin | Blanco, Pablo | Leopaldi, Agustin | Sosa, Jesus
  Fecha        : 2026-10-09
- Script       : 80_SP_Negocio_Partidos.sql
+ Script       : 40_SP_Negocio_Partidos.sql
  Objetivo     : Logica de negocio de partidos, sedes y resultados. Cada SP valida
                 todo primero (un unico mensaje) y despues opera dentro de una
                 transaccion:

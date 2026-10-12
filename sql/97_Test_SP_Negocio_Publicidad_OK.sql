@@ -6,7 +6,7 @@
  Fecha        : 2026-10-11
  Script       : 97_Test_SP_Negocio_Publicidad_OK.sql
  Objetivo     : Testing exitoso de 96_SP_Negocio_Publicidad.sql (relacion 1:1) y de las
-                funciones de 70_Funciones_Publicidad.sql. Recorre el ciclo completo
+                funciones de 59_Funciones_Publicidad.sql. Recorre el ciclo completo
                 en INC-P2 (Ecuador - Uruguay, grupos, 19/06/2026 18:00 UTC):
                 simulacion de prime time, propuesta de las 4 piezas, venta de dos
                 espacios, fin del partido y registro de la exhibicion.

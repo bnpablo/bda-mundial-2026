@@ -4,12 +4,12 @@
  Comision     : 02-5600 | Grupo N° 4
  Integrantes  : Avila, Agustin | Blanco, Pablo | Leopaldi, Agustin | Sosa, Jesus
  Fecha        : 2026-10-09
- Script       : 82_Test_SP_Negocio_Partidos_Validaciones.sql
- Objetivo     : Testing de las validaciones de 80_SP_Negocio_Partidos.sql (relacion 1:1).
+ Script       : 42_Test_SP_Negocio_Partidos_Validaciones.sql
+ Objetivo     : Testing de las validaciones de 40_SP_Negocio_Partidos.sql (relacion 1:1).
                 Cada caso invalido se ejecuta dentro de TRY/CATCH: muestra el numero
                 de error y el mensaje unico que agrupa todas las condiciones que no
                 se cumplen. La prueba 4 comprueba que la operacion es "todo o nada".
- Requisito    : ejecutar despues de 81_Test_SP_Negocio_Partidos_OK.sql. Estado de los
+ Requisito    : ejecutar despues de 41_Test_SP_Negocio_Partidos_OK.sql. Estado de los
                 partidos: 1 Programado (sin selecciones), 3 Finalizado, 4 Programado
                 (Francia-Mexico, sin convocados) y 5 En juego (octavos Argentina-Brasil).
 ==============================================================================*/

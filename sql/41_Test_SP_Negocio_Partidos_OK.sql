@@ -4,8 +4,8 @@
  Comision     : 02-5600 | Grupo N° 4
  Integrantes  : Avila, Agustin | Blanco, Pablo | Leopaldi, Agustin | Sosa, Jesus
  Fecha        : 2026-10-09
- Script       : 81_Test_SP_Negocio_Partidos_OK.sql
- Objetivo     : Testing exitoso de 80_SP_Negocio_Partidos.sql (relacion 1:1). Recorre
+ Script       : 41_Test_SP_Negocio_Partidos_OK.sql
+ Objetivo     : Testing exitoso de 40_SP_Negocio_Partidos.sql (relacion 1:1). Recorre
                 el ciclo de vida de los partidos: registrar (con sede nueva y con
                 sede existente), iniciar, finalizar, suspender y reprogramar.
  Requisito    : ejecutar despues de 22_Test_SP_ABM_Seleccion_Validaciones.sql (usa los
@@ -70,7 +70,7 @@ EXEC Torneo.usp_ReprogramarPartido @IdPartido = @IdP4, @FechaHoraUtc = '2026-06-
 SELECT IdPartido, Estado, FechaHoraUtc, FechaHoraLocal FROM Torneo.Partido WHERE IdPartido = @IdP4;
 
 PRINT '=== Prueba 6: iniciar el partido de octavos ===';
--- Resultado esperado: el partido 5 pasa a En juego. Queda asi para las pruebas de validaciones del script 82.
+-- Resultado esperado: el partido 5 pasa a En juego. Queda asi para las pruebas de validaciones del script 42.
 EXEC Torneo.usp_IniciarPartido @IdPartido = @IdP5;
 SELECT IdPartido, Fase, Estado FROM Torneo.Partido WHERE IdPartido = @IdP5;
 GO

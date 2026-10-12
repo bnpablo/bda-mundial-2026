@@ -4,12 +4,12 @@
  Comision     : 02-5600 | Grupo N° 4
  Integrantes  : Avila, Agustin | Blanco, Pablo | Leopaldi, Agustin | Sosa, Jesus
  Fecha        : 2026-10-11
- Script       : 92_Test_SP_Incidencia_Validaciones.sql
- Objetivo     : Testing de las validaciones de 90_SP_Incidencia.sql (relacion 1:1).
+ Script       : 78_Test_SP_Incidencia_Validaciones.sql
+ Objetivo     : Testing de las validaciones de 76_SP_Incidencia.sql (relacion 1:1).
                 Cada caso invalido se ejecuta dentro de TRY/CATCH: muestra el numero
                 de error y el mensaje unico que agrupa todas las condiciones que no
                 se cumplen.
- Requisito    : ejecutar despues de 91_Test_SP_Incidencia_OK.sql. Estado: INC-P0
+ Requisito    : ejecutar despues de 77_Test_SP_Incidencia_OK.sql. Estado: INC-P0
                 Finalizado; P1 a P5 En juego (P1: Uruguay 2 - Colombia 0, URY-01
                 expulsado al 50' del segundo tiempo, URY-02 sustituido al 60' por
                 URY-03); INC-P4: gol de ECU-01 y ECU-01 expulsado al 40'; INC-P6
