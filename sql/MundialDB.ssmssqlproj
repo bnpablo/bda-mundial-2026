@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SqlWorkbenchSqlProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="SqlWorkbenchSqlProject">
+  <Items>
+    <LogicalFolder Name="Connections" Type="2" />
+    <LogicalFolder Name="Queries" Type="0">
+      <Items>
+        <FileNode Name="01_Base_Esquemas.sql">
+          <FullPath>01_Base_Esquemas.sql</FullPath>
+        </FileNode>
+        <FileNode Name="02_Tablas_Torneo.sql">
+          <FullPath>02_Tablas_Torneo.sql</FullPath>
+        </FileNode>
+        <FileNode Name="03_Tablas_Formacion.sql">
+          <FullPath>03_Tablas_Formacion.sql</FullPath>
+        </FileNode>
+        <FileNode Name="04_Tablas_Arbitraje_Incidencia.sql">
+          <FullPath>04_Tablas_Arbitraje_Incidencia.sql</FullPath>
+        </FileNode>
+        <FileNode Name="06_Tablas_Publicidad.sql">
+          <FullPath>06_Tablas_Publicidad.sql</FullPath>
+        </FileNode>
+        <FileNode Name="10_SP_ABM_Torneo.sql">
+          <FullPath>10_SP_ABM_Torneo.sql</FullPath>
+        </FileNode>
+        <FileNode Name="11_Test_SP_ABM_Torneo_OK.sql">
+          <FullPath>11_Test_SP_ABM_Torneo_OK.sql</FullPath>
+        </FileNode>
+        <FileNode Name="12_Test_SP_ABM_Torneo_Validaciones.sql">
+          <FullPath>12_Test_SP_ABM_Torneo_Validaciones.sql</FullPath>
+        </FileNode>
+        <FileNode Name="20_SP_ABM_Seleccion.sql">
+          <FullPath>20_SP_ABM_Seleccion.sql</FullPath>
+        </FileNode>
+        <FileNode Name="21_Test_SP_ABM_Seleccion_OK.sql">
+          <FullPath>21_Test_SP_ABM_Seleccion_OK.sql</FullPath>
+        </FileNode>
+        <FileNode Name="22_Test_SP_ABM_Seleccion_Validaciones.sql">
+          <FullPath>22_Test_SP_ABM_Seleccion_Validaciones.sql</FullPath>
+        </FileNode>
+        <FileNode Name="30_SP_ABM_Formacion.sql">
+          <FullPath>30_SP_ABM_Formacion.sql</FullPath>
+        </FileNode>
+        <FileNode Name="31_Test_SP_ABM_Formacion_OK.sql">
+          <FullPath>31_Test_SP_ABM_Formacion_OK.sql</FullPath>
+        </FileNode>
+        <FileNode Name="32_Test_SP_ABM_Formacion_Validaciones.sql">
+          <FullPath>32_Test_SP_ABM_Formacion_Validaciones.sql</FullPath>
+        </FileNode>
+        <FileNode Name="40_SP_Negocio_Partidos.sql">
+          <FullPath>40_SP_Negocio_Partidos.sql</FullPath>
+        </FileNode>
+        <FileNode Name="41_Test_SP_Negocio_Partidos_OK.sql">
+          <FullPath>41_Test_SP_Negocio_Partidos_OK.sql</FullPath>
+        </FileNode>
+        <FileNode Name="42_Test_SP_Negocio_Partidos_Validaciones.sql">
+          <FullPath>42_Test_SP_Negocio_Partidos_Validaciones.sql</FullPath>
+        </FileNode>
+        <FileNode Name="50_SP_ABM_Arbitraje.sql">
+          <FullPath>50_SP_ABM_Arbitraje.sql</FullPath>
+        </FileNode>
+        <FileNode Name="51_Test_SP_ABM_Arbitraje_OK.sql">
+          <FullPath>51_Test_SP_ABM_Arbitraje_OK.sql</FullPath>
+        </FileNode>
+        <FileNode Name="52_Test_SP_ABM_Arbitraje_Validaciones.sql">
+          <FullPath>52_Test_SP_ABM_Arbitraje_Validaciones.sql</FullPath>
+        </FileNode>
+        <FileNode Name="59_Funciones_Publicidad.sql">
+          <FullPath>59_Funciones_Publicidad.sql</FullPath>
+        </FileNode>
+        <FileNode Name="60_SP_ABM_Publicidad.sql">
+          <FullPath>60_SP_ABM_Publicidad.sql</FullPath>
+        </FileNode>
+        <FileNode Name="61_Test_SP_ABM_Publicidad_OK.sql">
+          <FullPath>61_Test_SP_ABM_Publicidad_OK.sql</FullPath>
+        </FileNode>
+        <FileNode Name="62_Test_SP_ABM_Publicidad_Validaciones.sql">
+          <FullPath>62_Test_SP_ABM_Publicidad_Validaciones.sql</FullPath>
+        </FileNode>
+        <FileNode Name="75_Funciones_Incidencia.sql">
+          <FullPath>75_Funciones_Incidencia.sql</FullPath>
+        </FileNode>
+        <FileNode Name="76_SP_Incidencia.sql">
+          <FullPath>76_SP_Incidencia.sql</FullPath>
+        </FileNode>
+        <FileNode Name="77_Test_SP_Incidencia_OK.sql">
+          <FullPath>77_Test_SP_Incidencia_OK.sql</FullPath>
+        </FileNode>
+        <FileNode Name="78_Test_SP_Incidencia_Validaciones.sql">
+          <FullPath>78_Test_SP_Incidencia_Validaciones.sql</FullPath>
+        </FileNode>
+        <FileNode Name="83_SP_Negocio_Convocatoria.sql">
+          <FullPath>83_SP_Negocio_Convocatoria.sql</FullPath>
+        </FileNode>
+        <FileNode Name="84_Test_SP_Negocio_Convocatoria_OK.sql">
+          <FullPath>84_Test_SP_Negocio_Convocatoria_OK.sql</FullPath>
+        </FileNode>
+        <FileNode Name="85_Test_SP_Negocio_Convocatoria_Validaciones.sql">
+          <FullPath>85_Test_SP_Negocio_Convocatoria_Validaciones.sql</FullPath>
+        </FileNode>
+        <FileNode Name="86_SP_Negocio_Alineaciones.sql">
+          <FullPath>86_SP_Negocio_Alineaciones.sql</FullPath>
+        </FileNode>
+        <FileNode Name="87_Test_SP_Negocio_Alineaciones_OK.sql">
+          <FullPath>87_Test_SP_Negocio_Alineaciones_OK.sql</FullPath>
+        </FileNode>
+        <FileNode Name="88_Test_SP_Negocio_Alineaciones_Validaciones.sql">
+          <FullPath>88_Test_SP_Negocio_Alineaciones_Validaciones.sql</FullPath>
+        </FileNode>
+        <FileNode Name="93_SP_Negocio_DesignacionArbitral.sql">
+          <FullPath>93_SP_Negocio_DesignacionArbitral.sql</FullPath>
+        </FileNode>
+        <FileNode Name="94_Test_SP_Negocio_DesignacionArbitral_OK.sql">
+          <FullPath>94_Test_SP_Negocio_DesignacionArbitral_OK.sql</FullPath>
+        </FileNode>
+        <FileNode Name="95_Test_SP_Negocio_DesignacionArbitral_Validaciones.sql">
+          <FullPath>95_Test_SP_Negocio_DesignacionArbitral_Validaciones.sql</FullPath>
+        </FileNode>
+        <FileNode Name="96_SP_Negocio_Publicidad.sql">
+          <FullPath>96_SP_Negocio_Publicidad.sql</FullPath>
+        </FileNode>
+        <FileNode Name="97_Test_SP_Negocio_Publicidad_OK.sql">
+          <FullPath>97_Test_SP_Negocio_Publicidad_OK.sql</FullPath>
+        </FileNode>
+        <FileNode Name="98_Test_SP_Negocio_Publicidad_Validaciones.sql">
+          <FullPath>98_Test_SP_Negocio_Publicidad_Validaciones.sql</FullPath>
+        </FileNode>
+        <FileNode Name="99_Datos_Aceptacion.sql">
+          <FullPath>99_Datos_Aceptacion.sql</FullPath>
+        </FileNode>
+      </Items>
+    </LogicalFolder>
+    <LogicalFolder Name="Miscellaneous" Type="3" />
+  </Items>
+</SqlWorkbenchSqlProject>
