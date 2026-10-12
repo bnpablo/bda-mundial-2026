@@ -10,7 +10,9 @@
                 error y el mensaje unico que agrupa todas las condiciones que no se
                 cumplen. Para las pruebas con una seleccion sin alineacion se crea
                 un partido temporal (PARTIDO-006) que se elimina al terminar.
- Requisito    : ejecutar despues de 87_Test_SP_Negocio_Alineaciones_OK.sql. Estado:
+ Requisito    : ejecutar despues de 87_Test_SP_Negocio_Alineaciones_OK.sql y de
+                77_Test_SP_Incidencia_OK.sql (la prueba 15 usa el partido INC-P3 y a
+                URY-04, suspendido por acumulacion de amarillas). Estado:
                 el partido 5 (En juego) con la alineacion de Argentina y de Brasil y
                 un cambio de cada una; el partido 3 (Finalizado) con la alineacion
                 de Argentina cargada por el script 31; ARG-26 de baja desde el
@@ -28,6 +30,9 @@ DECLARE @SedeMetLife INT = (SELECT IdSede FROM Torneo.Sede WHERE CodigoExterno =
 DECLARE @IdP3 INT = (SELECT IdPartido FROM Torneo.Partido WHERE CodigoExterno = 'PARTIDO-003');
 DECLARE @IdP5 INT = (SELECT IdPartido FROM Torneo.Partido WHERE CodigoExterno = 'PARTIDO-005');
 DECLARE @IdP6 INT;
+DECLARE @IdPInc3 INT = (SELECT IdPartido FROM Torneo.Partido WHERE CodigoExterno = 'INC-P3');
+DECLARE @SelUry INT = (SELECT IdSeleccion FROM Torneo.Seleccion WHERE CodigoExterno = 'SEL-URY');
+DECLARE @jsonSusp VARCHAR(MAX);
 DECLARE @Arg01 INT, @Arg05 INT, @Arg06 INT, @Arg07 INT, @Arg14 INT;
 DECLARE @jsonArg VARCHAR(MAX), @jsonMalo VARCHAR(MAX), @jsonBaja VARCHAR(MAX), @jsonOtra VARCHAR(MAX);
 
@@ -53,7 +58,7 @@ SET @jsonArg = (
 EXEC Torneo.usp_Partido_Alta 'PARTIDO-006', 6, 'Octavos', @SedeMetLife, '2026-07-10 20:00', @SelArg, @SelBra, NULL, NULL, @IdP6 OUTPUT;
 
 SELECT (SELECT COUNT(*) FROM Torneo.Partido) AS Partidos, (SELECT COUNT(*) FROM Formacion.Alineacion) AS Alineaciones,
-       (SELECT COUNT(*) FROM Formacion.Sustitucion) AS Sustituciones;     -- esperado: 5 (incluye el temporal), 52, 7
+       (SELECT COUNT(*) FROM Formacion.Sustitucion) AS Sustituciones;     -- esperado: 12 (incluye el temporal), 66, 8
 
 /*------------------------------------------------------------------------------
  REGISTRAR ALINEACION
@@ -221,9 +226,29 @@ PRINT '=== Prueba 14: verificar un partido sin alineaciones ===';
 -- estado INCOMPLETA (el partido temporal todavia no tiene alineaciones).
 EXEC Formacion.usp_VerificarAlineacion @IdPartido = @IdP6;
 
+PRINT '=== Prueba 15: alineacion con un jugador suspendido ===';
+-- Resultado esperado: error 50001 con 2 condiciones: la seleccion ya tiene alineacion registrada en este partido
+-- (Uruguay en INC-P3) y hay jugadores suspendidos para el partido (URY-04, titular, acumulo 2 amarillas en los
+-- partidos anteriores y cumple la fecha en INC-P3).
+SET @jsonSusp = (
+    SELECT j.IdJugador,
+           CAST(CASE WHEN j.Dorsal <= 11 THEN 1 ELSE 0 END AS BIT) AS EsTitular,
+           j.PosicionHabitual AS PosicionCancha
+    FROM Torneo.Jugador j
+    WHERE j.IdSeleccion = @SelUry AND j.FechaBaja IS NULL AND j.Dorsal BETWEEN 1 AND 17
+    ORDER BY j.Dorsal
+    FOR JSON PATH);
+BEGIN TRY
+    EXEC Formacion.usp_RegistrarAlineacion @IdPartido = @IdPInc3, @IdSeleccion = @SelUry, @EsquemaTactico = '4-3-3',
+         @Jugadores = @jsonSusp;
+END TRY
+BEGIN CATCH
+    SELECT ERROR_NUMBER() AS Numero, ERROR_MESSAGE() AS Mensaje;
+END CATCH
+
 -- Se elimina el partido temporal
 EXEC Torneo.usp_Partido_Baja @IdPartido = @IdP6;
 
 SELECT (SELECT COUNT(*) FROM Torneo.Partido) AS Partidos, (SELECT COUNT(*) FROM Formacion.Alineacion) AS Alineaciones,
-       (SELECT COUNT(*) FROM Formacion.Sustitucion) AS Sustituciones;     -- esperado: 4, 52, 7 (las pruebas no cambiaron nada)
+       (SELECT COUNT(*) FROM Formacion.Sustitucion) AS Sustituciones;     -- esperado: 11, 66, 8 (las pruebas no cambiaron nada)
 GO

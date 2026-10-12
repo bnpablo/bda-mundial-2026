@@ -21,7 +21,7 @@
                 La lista de jugadores de usp_RegistrarAlineacion se recibe como JSON
                 (arreglo de objetos con IdJugador, EsTitular y PosicionCancha) y se
                 procesa con OPENJSON, sin cursores ni SQL dinamico.
- Depende de   : 30_SP_ABM_Formacion.sql
+ Depende de   : 30_SP_ABM_Formacion.sql y 75_Funciones_Incidencia.sql (jugadores suspendidos)
 ==============================================================================*/
 USE MundialDB;
 GO
@@ -32,7 +32,10 @@ GO
  partido y no tener alineacion registrada; el esquema tactico tiene la forma 4-3-3
  y suma 10 jugadores de campo; la lista tiene entre 11 y 26 jugadores, exactamente
  11 titulares y un solo arquero entre ellos; los jugadores existen, son de la
- seleccion, no se repiten y no estaban dados de baja a la fecha del partido.
+ seleccion, no se repiten, no estaban dados de baja a la fecha del partido y no
+ estan suspendidos para el partido (Incidencia.fn_JugadorSuspendido, con los
+ criterios del reglamento): un suspendido no puede figurar ni de titular ni de
+ suplente.
 ------------------------------------------------------------------------------*/
 CREATE OR ALTER PROCEDURE Formacion.usp_RegistrarAlineacion
     @IdPartido      INT,
@@ -135,6 +138,12 @@ BEGIN
                        JOIN Torneo.Jugador j ON j.IdJugador = t.IdJugador
                        WHERE j.FechaBaja IS NOT NULL AND j.FechaBaja <= @fechaPartido)
                 SET @errores += 'Hay jugadores dados de baja a la fecha del partido. ';
+
+            IF EXISTS (SELECT 1
+                       FROM @tmpJugadores t
+                       WHERE t.IdJugador IS NOT NULL
+                         AND Incidencia.fn_JugadorSuspendido(t.IdJugador, @IdPartido, DEFAULT, DEFAULT, DEFAULT) = 1)
+                SET @errores += 'Hay jugadores suspendidos para este partido por rojas o acumulacion de amarillas. ';
         END;
     END;
 
