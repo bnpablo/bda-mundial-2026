@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+Project("{4F2E2C19-372F-40d8-9FA7-9D2138C6997A}") = "MundialDB", "sql\MundialDB.ssmssqlproj", "{6B1F0C3E-52A4-4C1B-9D77-3E8A5B2C9F10}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Default|Default = Default|Default
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6B1F0C3E-52A4-4C1B-9D77-3E8A5B2C9F10}.Default|Default.ActiveCfg = Default|Default
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
