@@ -19,6 +19,9 @@
         <FileNode Name="06_Tablas_Publicidad.sql">
           <FullPath>06_Tablas_Publicidad.sql</FullPath>
         </FileNode>
+        <FileNode Name="07_Configuracion_Importacion.sql">
+          <FullPath>07_Configuracion_Importacion.sql</FullPath>
+        </FileNode>
         <FileNode Name="10_SP_ABM_Torneo.sql">
           <FullPath>10_SP_ABM_Torneo.sql</FullPath>
         </FileNode>
@@ -64,6 +67,9 @@
         <FileNode Name="52_Test_SP_ABM_Arbitraje_Validaciones.sql">
           <FullPath>52_Test_SP_ABM_Arbitraje_Validaciones.sql</FullPath>
         </FileNode>
+        <FileNode Name="58_Funciones_Importacion.sql">
+          <FullPath>58_Funciones_Importacion.sql</FullPath>
+        </FileNode>
         <FileNode Name="59_Funciones_Publicidad.sql">
           <FullPath>59_Funciones_Publicidad.sql</FullPath>
         </FileNode>
@@ -76,6 +82,42 @@
         <FileNode Name="62_Test_SP_ABM_Publicidad_Validaciones.sql">
           <FullPath>62_Test_SP_ABM_Publicidad_Validaciones.sql</FullPath>
         </FileNode>
+        <FileNode Name="63_SP_Importacion_Comun.sql">
+          <FullPath>63_SP_Importacion_Comun.sql</FullPath>
+        </FileNode>
+        <FileNode Name="64_Test_SP_Importacion_Comun_OK.sql">
+          <FullPath>64_Test_SP_Importacion_Comun_OK.sql</FullPath>
+        </FileNode>
+        <FileNode Name="65_Test_SP_Importacion_Comun_Validaciones.sql">
+          <FullPath>65_Test_SP_Importacion_Comun_Validaciones.sql</FullPath>
+        </FileNode>
+        <FileNode Name="66_SP_Importacion_Arbitros_Csv.sql">
+          <FullPath>66_SP_Importacion_Arbitros_Csv.sql</FullPath>
+        </FileNode>
+        <FileNode Name="67_Test_SP_Importacion_Arbitros_Csv_OK.sql">
+          <FullPath>67_Test_SP_Importacion_Arbitros_Csv_OK.sql</FullPath>
+        </FileNode>
+        <FileNode Name="68_Test_SP_Importacion_Arbitros_Csv_Validaciones.sql">
+          <FullPath>68_Test_SP_Importacion_Arbitros_Csv_Validaciones.sql</FullPath>
+        </FileNode>
+        <FileNode Name="69_SP_Importacion_Campanias_Xml.sql">
+          <FullPath>69_SP_Importacion_Campanias_Xml.sql</FullPath>
+        </FileNode>
+        <FileNode Name="70_Test_SP_Importacion_Campanias_Xml_OK.sql">
+          <FullPath>70_Test_SP_Importacion_Campanias_Xml_OK.sql</FullPath>
+        </FileNode>
+        <FileNode Name="71_Test_SP_Importacion_Campanias_Xml_Validaciones.sql">
+          <FullPath>71_Test_SP_Importacion_Campanias_Xml_Validaciones.sql</FullPath>
+        </FileNode>
+        <FileNode Name="72_SP_Importacion_APIs.sql">
+          <FullPath>72_SP_Importacion_APIs.sql</FullPath>
+        </FileNode>
+        <FileNode Name="73_Test_SP_Importacion_APIs_OK.sql">
+          <FullPath>73_Test_SP_Importacion_APIs_OK.sql</FullPath>
+        </FileNode>
+        <FileNode Name="74_Test_SP_Importacion_APIs_Validaciones.sql">
+          <FullPath>74_Test_SP_Importacion_APIs_Validaciones.sql</FullPath>
+        </FileNode>
         <FileNode Name="75_Funciones_Incidencia.sql">
           <FullPath>75_Funciones_Incidencia.sql</FullPath>
         </FileNode>
@@ -87,6 +129,15 @@
         </FileNode>
         <FileNode Name="78_Test_SP_Incidencia_Validaciones.sql">
           <FullPath>78_Test_SP_Incidencia_Validaciones.sql</FullPath>
+        </FileNode>
+        <FileNode Name="79_SP_Importacion_Scraping_Campanias.sql">
+          <FullPath>79_SP_Importacion_Scraping_Campanias.sql</FullPath>
+        </FileNode>
+        <FileNode Name="80_Test_SP_Importacion_Scraping_Campanias_OK.sql">
+          <FullPath>80_Test_SP_Importacion_Scraping_Campanias_OK.sql</FullPath>
+        </FileNode>
+        <FileNode Name="81_Test_SP_Importacion_Scraping_Campanias_Validaciones.sql">
+          <FullPath>81_Test_SP_Importacion_Scraping_Campanias_Validaciones.sql</FullPath>
         </FileNode>
         <FileNode Name="83_SP_Negocio_Convocatoria.sql">
           <FullPath>83_SP_Negocio_Convocatoria.sql</FullPath>
