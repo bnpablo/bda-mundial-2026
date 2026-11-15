@@ -3,7 +3,7 @@
  Materia      : Bases de Datos Aplicada (3641)
  Comision     : 02-5600 | Grupo N° 4
  Integrantes  : Avila, Agustin | Blanco, Pablo | Leopaldi, Agustin | Sosa, Jesus
- Fecha        : 2026-11-05
+ Fecha        : 2026-11-14
  Script       : 63_SP_Importacion_Comun.sql
  Objetivo     : Procedimientos que comparten los procesos de importacion:
                   Importacion.usp_LeerArchivo  devuelve un archivo como texto.
@@ -80,8 +80,11 @@ GO
 
 /*------------------------------------------------------------------------------
  Importacion.usp_ObtenerUrl
- Hace un GET con MSXML2.XMLHTTP. Error 50003 si no se pudo hacer el pedido, el
- estado HTTP no es 200 o la respuesta esta vacia o puede estar cortada.
+ Hace un GET con MSXML2.ServerXMLHTTP, la version para servidores del objeto
+ MSXML2.XMLHTTP. Permite fijar tiempos maximos de espera: sin ellos, si el
+ servidor no contesta, el SP queda esperando sin limite. Error 50003 si no se
+ pudo hacer el pedido (incluido el tiempo de espera vencido), el estado HTTP no
+ es 200 o la respuesta esta vacia o puede estar cortada.
 ------------------------------------------------------------------------------*/
 CREATE OR ALTER PROCEDURE Importacion.usp_ObtenerUrl
     @Url       VARCHAR(400),
@@ -110,7 +113,9 @@ BEGIN
     IF @errores <> ''
         THROW 50001, @errores, 1;
 
-    EXEC @hr = sp_OACreate 'MSXML2.XMLHTTP', @objeto OUT;
+    EXEC @hr = sp_OACreate 'MSXML2.ServerXMLHTTP', @objeto OUT;
+    -- Tiempos maximos, en milisegundos: resolver el nombre, conectar, enviar el pedido y recibir la respuesta.
+    IF @hr = 0 EXEC @hr = sp_OAMethod @objeto, 'setTimeouts', NULL, 5000, 5000, 10000, 10000;
     IF @hr = 0 EXEC @hr = sp_OAMethod @objeto, 'open', NULL, 'GET', @Url, 'false';
     IF @hr = 0 EXEC @hr = sp_OAMethod @objeto, 'send';
     IF @hr = 0 EXEC @hr = sp_OAGetProperty @objeto, 'status', @estado OUT;
