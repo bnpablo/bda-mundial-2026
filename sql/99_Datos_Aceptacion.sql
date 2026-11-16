@@ -3,20 +3,24 @@
  Materia      : Bases de Datos Aplicada (3641)
  Comision     : 02-5600 | Grupo N° 4
  Integrantes  : Avila, Agustin | Blanco, Pablo | Leopaldi, Agustin | Sosa, Jesus
- Fecha        : 2026-10-12
+ Fecha        : 2026-11-15
  Script       : 99_Datos_Aceptacion.sql
  Objetivo     : Juego de datos de aceptacion (seccion IV de la consigna). Carga,
-                unicamente con los SP de las tablas y de la logica de negocio, un
-                torneo completo de 16 selecciones y 32 partidos jugados:
+                unicamente con los SP de las tablas, de la logica de negocio y de
+                importacion, un torneo completo de 16 selecciones y 33 partidos
+                jugados:
                   - 8 sedes en 4 husos horarios distintos.
                   - 16 selecciones en 4 grupos, cada una con 23 convocados.
                   - 24 partidos de fase de grupos y 8 de eliminacion directa
                     (cuartos, semifinales, tercer puesto y final), con formacion
                     titular y banco de cada seleccion, cambios, goles, tarjetas,
                     definicion por penales y resultado final.
+                  - Un partido de dieciseisavos Argentina - Brasil (selecciones de
+                    los tests), para las campanias importadas, que son de Argentina.
                   - 16 arbitros; cada partido con principal, dos asistentes, cuarto
                     arbitro y VAR.
-                  - 8 anunciantes con campanias, piezas, paises de interes y tarifas;
+                  - 8 anunciantes con campanias, piezas, paises de interes y tarifas,
+                    y las 24 campanias de dossiermundial (importacion de la Entrega 6);
                     las 4 piezas de cada partido se asignan con la logica de negocio
                     y se registran como exhibidas.
                 Casos obligatorios que deja armados:
@@ -38,6 +42,8 @@
                 vez. Los datos usan codigos propios (AC-), asi que conviven con los
                 que dejan los tests; los paises que ya existen se reutilizan. Para
                 volver a ejecutarlo hay que recrear la base desde el 01.
+                Usa C:\Importar\campanias.xml, que genera el test 80; si no esta,
+                informa el error y sigue.
  Supuestos    : los PIB per capita de los paises son valores aproximados de ejemplo,
                 no oficiales. Los anunciantes no guardan su pais en el modelo: los
                 mercados de cada campania son los paises de interes de sus piezas.
@@ -204,7 +210,7 @@ BEGIN
 END;
 
 /*------------------------------------------------------------------------------
- 5. PUBLICIDAD: anunciantes, campanias, piezas, mercados y tarifas
+ 5. PUBLICIDAD: anunciantes, campanias, piezas, mercados, tarifas e importacion
 ------------------------------------------------------------------------------*/
 PRINT '=== Publicidad ===';
 CREATE TABLE #Anunciantes (Orden INT IDENTITY(1,1), Anunciante VARCHAR(120), Campania VARCHAR(120), Pieza VARCHAR(120),
@@ -268,12 +274,24 @@ BEGIN
     SET @i += 1;
 END;
 
+-- Campanias de dossiermundial: los anunciantes con id mayor a @ultimoAnunciante son los importados
+PRINT '=== Campanias importadas de dossiermundial ===';
+DECLARE @ultimoAnunciante INT = (SELECT ISNULL(MAX(IdAnunciante), 0) FROM Publicidad.Anunciante);
+BEGIN TRY
+    EXEC Importacion.usp_ImportarCampaniasXml @NombreArchivo = 'C:\Importar\campanias.xml';
+END TRY
+BEGIN CATCH
+    PRINT CONCAT('    Importacion de campanias con error ', ERROR_NUMBER(), ': ', ERROR_MESSAGE());
+END CATCH;
+
 /*------------------------------------------------------------------------------
- 6. CALENDARIO: 24 partidos de grupos y 8 de eliminacion directa
+ 6. CALENDARIO: 24 partidos de grupos, 8 de eliminacion directa y 1 de Argentina
  Cada grupo juega en tres fechas (1-2 y 3-4, 3-1 y 2-4, 4-1 y 2-3, con las
  posiciones del grupo); las fechas son el 11, 17 y 23 de junio. Hay tres
  horarios por dia (17:00, 20:00 y 23:00 UTC). Los resultados dejan a las
  selecciones 1 y 2 de cada grupo clasificadas a cuartos.
+ El de Argentina (AC-P33, 30 de junio) va ultimo: no comparte selecciones ni
+ horario con los otros 32.
 ------------------------------------------------------------------------------*/
 PRINT '=== Calendario ===';
 CREATE TABLE #Grupos (Grupo CHAR(1), T1 VARCHAR(3), T2 VARCHAR(3), T3 VARCHAR(3), T4 VARCHAR(3));
@@ -313,7 +331,8 @@ INSERT INTO #Cal (K, Fase, FechaHoraUtc, LocalIso, VisitIso, GolesL, GolesV, Pen
     (29, 'Semifinal',     '2026-07-09 20:00', 'DEU', 'BEL', 1, 0, NULL, NULL),
     (30, 'Semifinal',     '2026-07-10 20:00', 'AUT', 'CHE', 2, 2, 5,    4),
     (31, 'Tercer puesto', '2026-07-18 17:00', 'BEL', 'CHE', 2, 1, NULL, NULL),
-    (32, 'Final',         '2026-07-19 20:00', 'DEU', 'AUT', 2, 1, NULL, NULL);
+    (32, 'Final',         '2026-07-19 20:00', 'DEU', 'AUT', 2, 1, NULL, NULL),
+    (33, 'Dieciseisavos', '2026-06-30 23:00', 'ARG', 'BRA', 2, 1, NULL, NULL);
 
 UPDATE #Cal
 SET Codigo  = 'AC-P' + RIGHT('0' + CAST(K AS VARCHAR(2)), 2),
@@ -335,7 +354,7 @@ CREATE TABLE #Lesiones (LocalIso VARCHAR(3), VisitIso VARCHAR(3), EquipoIso VARC
 INSERT INTO #Lesiones VALUES ('JPN', 'PAN', 'PAN'), ('BEL', 'KOR', 'KOR');
 
 /*------------------------------------------------------------------------------
- 7. JUEGO DE LOS 32 PARTIDOS, EN ORDEN CRONOLOGICO
+ 7. JUEGO DE LOS 33 PARTIDOS, EN ORDEN CRONOLOGICO (EL DE ARGENTINA AL FINAL)
  Para cada partido: designacion arbitral, formaciones, piezas publicitarias,
  inicio, cambios, goles, tarjetas, penales, fin y exhibicion de la publicidad.
  La formacion de cada seleccion toma por posicion a los jugadores de menor
@@ -358,8 +377,9 @@ BEGIN
     SELECT @cod = Codigo, @num = Numero, @fase = Fase, @fh = FechaHoraUtc, @sedeCod = SedeCod, @lIso = LocalIso,
            @vIso = VisitIso, @gl = GolesL, @gv = GolesV, @pl = PenL, @pv = PenV
     FROM #Cal WHERE K = @k;
-    SET @selL = (SELECT IdSeleccion FROM Torneo.Seleccion WHERE CodigoExterno = 'AC-SEL-' + @lIso);
-    SET @selV = (SELECT IdSeleccion FROM Torneo.Seleccion WHERE CodigoExterno = 'AC-SEL-' + @vIso);
+    -- Seleccion de cada pais (incluye SEL-ARG y SEL-BRA de los tests)
+    SET @selL = (SELECT s.IdSeleccion FROM Torneo.Seleccion s JOIN Torneo.Pais p ON p.IdPais = s.IdPais WHERE p.CodigoIso3 = @lIso);
+    SET @selV = (SELECT s.IdSeleccion FROM Torneo.Seleccion s JOIN Torneo.Pais p ON p.IdPais = s.IdPais WHERE p.CodigoIso3 = @vIso);
 
     EXEC Torneo.usp_RegistrarPartido @CodigoExterno = @cod, @NumeroPartido = @num, @Fase = @fase, @FechaHoraUtc = @fh,
          @CodigoExternoSede = @sedeCod, @IdSeleccionLocal = @selL, @IdSeleccionVisitante = @selV, @IdPartido = @idP OUTPUT;
@@ -630,7 +650,7 @@ INSERT INTO #Verif (Orden, Criterio, Cargado, Requerido, Exacto) VALUES
          (SELECT COUNT(DISTINCT IdAnunciante) FROM Publicidad.Campania), 6, 0),
     (10, 'Espacios publicitarios exhibidos (4 por partido jugado)',
          (SELECT COUNT(*) FROM Publicidad.PublicidadPartido pp JOIN Torneo.Partido p ON p.IdPartido = pp.IdPartido
-          WHERE pp.Estado = 'Exhibida' AND p.CodigoExterno LIKE 'AC-P%'), 128, 1),
+          WHERE pp.Estado = 'Exhibida' AND p.CodigoExterno LIKE 'AC-P%'), 4 * @nPartidos, 1),
     (11, 'Expulsiones por doble amonestacion',
          (SELECT COUNT(*) FROM Incidencia.Tarjeta WHERE TipoTarjeta = 'Roja por doble amarilla'), 1, 0),
     (12, 'Rojas directas',
@@ -652,7 +672,14 @@ INSERT INTO #Verif (Orden, Criterio, Cargado, Requerido, Exacto) VALUES
           FROM Torneo.Partido p
           CROSS APPLY Incidencia.fn_SuspendidosPartido(p.IdPartido, DEFAULT, DEFAULT, DEFAULT) s
           WHERE p.CodigoExterno LIKE 'AC-P%'
-            AND EXISTS (SELECT 1 FROM Formacion.Alineacion a WHERE a.IdPartido = p.IdPartido AND a.IdJugador = s.IdJugador)), 0, 1);
+            AND EXISTS (SELECT 1 FROM Formacion.Alineacion a WHERE a.IdPartido = p.IdPartido AND a.IdJugador = s.IdJugador)), 0, 1),
+    (18, 'Anunciantes importados de dossiermundial',
+         (SELECT COUNT(*) FROM Publicidad.Anunciante WHERE IdAnunciante > @ultimoAnunciante), 1, 0),
+    (19, 'Espacios exhibidos con campanias importadas',
+         (SELECT COUNT(*) FROM Publicidad.PublicidadPartido pp
+          JOIN Publicidad.Pieza pz    ON pz.IdPieza = pp.IdPieza
+          JOIN Publicidad.Campania ca ON ca.IdCampania = pz.IdCampania
+          WHERE pp.Estado = 'Exhibida' AND ca.IdAnunciante > @ultimoAnunciante), 1, 0);
 
 SELECT Criterio, Cargado, Requerido,
        CASE WHEN (Exacto = 0 AND Cargado >= Requerido) OR (Exacto = 1 AND Cargado = Requerido) THEN 'Cumple' ELSE 'NO CUMPLE' END AS Resultado
@@ -681,4 +708,15 @@ PRINT '=== Espacios exhibidos en AC-P03 ===';
 SELECT pp.NumeroEspacio, pz.Nombre AS Pieza, pp.Criterio, pp.Puntaje, pp.Estado
 FROM Publicidad.PublicidadPartido pp JOIN Publicidad.Pieza pz ON pz.IdPieza = pp.IdPieza
 WHERE pp.IdPartido = @idP03 ORDER BY pp.NumeroEspacio;
+
+PRINT '=== Espacios exhibidos en el partido de Argentina (AC-P33) ===';
+SELECT pp.NumeroEspacio, pz.Nombre AS Pieza, an.Nombre AS Anunciante,
+       CASE WHEN an.IdAnunciante > @ultimoAnunciante THEN 'Importada' ELSE 'No importada' END AS Origen,
+       pp.Criterio, pp.Puntaje, pp.Estado
+FROM Publicidad.PublicidadPartido pp
+JOIN Publicidad.Pieza pz      ON pz.IdPieza = pp.IdPieza
+JOIN Publicidad.Campania ca   ON ca.IdCampania = pz.IdCampania
+JOIN Publicidad.Anunciante an ON an.IdAnunciante = ca.IdAnunciante
+WHERE pp.IdPartido = (SELECT IdPartido FROM Torneo.Partido WHERE CodigoExterno = 'AC-P33')
+ORDER BY pp.NumeroEspacio;
 GO
