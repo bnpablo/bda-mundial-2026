@@ -30,8 +30,9 @@ IF DB_ID('MundialDB') IS NOT NULL
  El argumento FILENAME de CREATE DATABASE solo acepta literales, no variables.
  "FILENAME = N'D:\SQLData\MundialDB.mdf'"
  Para que cada maquina pueda usar su propia carpeta sin editar el CREATE
- DATABASE, la sentencia se arma como texto y se ejecuta con EXEC. Es el unico
- uso de SQL dinamico del proyecto y no recibe datos de usuarios.
+ DATABASE, la sentencia se arma como texto y se ejecuta con EXEC. No recibe
+ datos de usuarios. El otro uso de SQL dinamico del proyecto es el PIVOT de
+ Reportes.usp_ReportarMatrizPrimeTime (89_SP_Reportes.sql).
 ------------------------------------------------------------------------------*/
 -- CONFIGURACION (sin barra final en las rutas)
 DECLARE @RutaDatos AS NVARCHAR (260) = N'D:\SQLData';
