@@ -157,6 +157,18 @@
         <FileNode Name="88_Test_SP_Negocio_Alineaciones_Validaciones.sql">
           <FullPath>88_Test_SP_Negocio_Alineaciones_Validaciones.sql</FullPath>
         </FileNode>
+        <FileNode Name="89_SP_Reportes.sql">
+          <FullPath>89_SP_Reportes.sql</FullPath>
+        </FileNode>
+        <FileNode Name="90_Test_SP_Reportes_OK.sql">
+          <FullPath>90_Test_SP_Reportes_OK.sql</FullPath>
+        </FileNode>
+        <FileNode Name="91_Test_SP_Reportes_Validaciones.sql">
+          <FullPath>91_Test_SP_Reportes_Validaciones.sql</FullPath>
+        </FileNode>
+        <FileNode Name="92_Demo_Reportes.sql">
+          <FullPath>92_Demo_Reportes.sql</FullPath>
+        </FileNode>
         <FileNode Name="93_SP_Negocio_DesignacionArbitral.sql">
           <FullPath>93_SP_Negocio_DesignacionArbitral.sql</FullPath>
         </FileNode>
