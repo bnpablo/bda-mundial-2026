@@ -4,7 +4,7 @@
  Comision     : 02-5600 | Grupo N° 4
  Integrantes  : Avila, Agustin | Blanco, Pablo | Leopaldi, Agustin | Sosa, Jesus
  Fecha        : 2026-11-15
- Script       : 92_Demo_Reportes.sql
+ Script       : 99_Demo_Reportes.sql
  Objetivo     : Demostracion de los reportes de 89_SP_Reportes.sql sobre los datos
                 cargados en la base:
                   Paso 0  los datos sobre los que salen los reportes
@@ -20,11 +20,10 @@
                 Cada paso es un lote aparte, con un EXEC y sin variables: se puede
                 ejecutar el script entero o seleccionar un paso y ejecutarlo solo.
                 Solo lee datos: no crea ni modifica nada, asi que se puede repetir.
-                En la instalacion completa corre antes de 93 a 99 y muestra los
-                datos que cargaron los tests. Para ver el torneo completo, ejecutarlo
-                despues de 99_Datos_Aceptacion.sql. Los resultados esperados de
-                cada paso son los de la base completa.
- Requisito    : ejecutar despues de 89_SP_Reportes.sql.
+                Lleva el numero 99 y el orden alfabetico lo ubica despues de
+                99_Datos_Aceptacion.sql, asi que corre sobre el torneo completo. Los
+                resultados esperados de cada paso son los de esa base.
+ Requisito    : ejecutar despues de 99_Datos_Aceptacion.sql.
 ==============================================================================*/
 USE MundialDB;
 GO
