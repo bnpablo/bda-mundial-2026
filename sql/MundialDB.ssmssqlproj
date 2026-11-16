@@ -166,9 +166,6 @@
         <FileNode Name="91_Test_SP_Reportes_Validaciones.sql">
           <FullPath>91_Test_SP_Reportes_Validaciones.sql</FullPath>
         </FileNode>
-        <FileNode Name="92_Demo_Reportes.sql">
-          <FullPath>92_Demo_Reportes.sql</FullPath>
-        </FileNode>
         <FileNode Name="93_SP_Negocio_DesignacionArbitral.sql">
           <FullPath>93_SP_Negocio_DesignacionArbitral.sql</FullPath>
         </FileNode>
@@ -189,6 +186,9 @@
         </FileNode>
         <FileNode Name="99_Datos_Aceptacion.sql">
           <FullPath>99_Datos_Aceptacion.sql</FullPath>
+        </FileNode>
+        <FileNode Name="99_Demo_Reportes.sql">
+          <FullPath>99_Demo_Reportes.sql</FullPath>
         </FileNode>
       </Items>
     </LogicalFolder>
