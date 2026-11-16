@@ -33,8 +33,8 @@ SET NOCOUNT ON;
 GO
 
 PRINT '=== Paso 0: los datos sobre los que salen los reportes ===';
--- Resultado esperado: Selecciones 25, Convocados 485, Partidos 46, Jugados 36, Goles 83, Tarjetas 37,
--- ArbitrosDesignados 22 y EspaciosExhibidos 130.
+-- Resultado esperado: Selecciones 25, Convocados 485, Partidos 47, Jugados 37, Goles 86, Tarjetas 38,
+-- ArbitrosDesignados 22 y EspaciosExhibidos 134.
 SELECT (SELECT COUNT(*) FROM Torneo.Seleccion)                                      AS Selecciones,
        (SELECT COUNT(*) FROM Torneo.Jugador WHERE FechaBaja IS NULL)                 AS Convocados,
        (SELECT COUNT(*) FROM Torneo.Partido)                                         AS Partidos,
@@ -46,39 +46,40 @@ SELECT (SELECT COUNT(*) FROM Torneo.Seleccion)                                  
 GO
 
 PRINT '=== Paso 1: goleadores por seleccion, fase y torneo ===';
--- Resultado esperado: 27 goleadores. En el puesto 1, con 6 goles, Alemania 07, Austria 07 y Suiza 07; despues Belgica 07
+-- Resultado esperado: 30 goleadores. En el puesto 1, con 6 goles, Alemania 07, Austria 07 y Suiza 07; despues Belgica 07
 -- con 5. Cada fila tiene los goles de cada fase y el total.
 EXEC Reportes.usp_ReportarGoleadores;
 GO
 
 PRINT '=== Paso 2: tarjetas por seleccion y jugador ===';
 -- Resultado esperado: dos resultados. El primero, una fila por seleccion (25, tambien las que no tienen tarjetas), con
--- Uruguay arriba: 9 amarillas y 1 roja por doble amarilla. El segundo, los 18 jugadores con tarjetas y su situacion para el
--- proximo partido: 15 sin partidos pendientes y 3 habilitados.
+-- Uruguay arriba: 9 amarillas y 1 roja por doble amarilla. El segundo, los 19 jugadores con tarjetas y su situacion para el
+-- proximo partido: 15 sin partidos pendientes y 4 habilitados.
 EXEC Reportes.usp_ReportarTarjetas;
 GO
 
 PRINT '=== Paso 3: designaciones arbitrales (XML) ===';
--- Resultado esperado: un XML con 22 arbitros, sus 170 designaciones y las 28 tarjetas de los partidos donde fueron
+-- Resultado esperado: un XML con 22 arbitros, sus 175 designaciones y las 29 tarjetas de los partidos donde fueron
 -- Principal. En la grilla sale como un enlace: un clic lo abre en otra pestania.
 EXEC Reportes.usp_ReportarDesignaciones;
 GO
 
 PRINT '=== Paso 4: ocupacion publicitaria por sede y partido ===';
--- Resultado esperado: dos resultados. El primero, los 33 partidos con publicidad exhibida, con el anunciante de cada
--- espacio y el ingreso del partido. El segundo, las 9 sedes, con Levis Stadium arriba: 4 partidos, 16 espacios y
+-- Resultado esperado: dos resultados. El primero, los 34 partidos con publicidad exhibida, con el anunciante de cada
+-- espacio y el ingreso del partido. En el 233, Argentina - Brasil, tres de los cuatro espacios son campanias importadas
+-- de dossiermundial (Pax Assistance, Quilmes y DSports). El segundo, las 9 sedes, con Levis Stadium arriba: 4 partidos, 16 espacios y
 -- 1460000.00 USD.
 EXEC Reportes.usp_ReportarOcupacionPublicitaria;
 GO
 
 PRINT '=== Paso 5: matriz de prime time ===';
--- Resultado esperado: una fila por partido (46) y una columna por pais (31). Por ejemplo, el 203 (23:00 UTC) esta en
+-- Resultado esperado: una fila por partido (47) y una columna por pais (31). Por ejemplo, el 203 (23:00 UTC) esta en
 -- prime time en ARG, BRA, CAN, PRY, URY y USA.
 EXEC Reportes.usp_ReportarMatrizPrimeTime;
 GO
 
 PRINT '=== Paso 6: matriz de prime time con otra franja ===';
--- Resultado esperado: los mismos 46 partidos, con otros valores: el 201 (17:00 UTC) pasa a estar en prime time en
+-- Resultado esperado: los mismos 47 partidos, con otros valores: el 201 (17:00 UTC) pasa a estar en prime time en
 -- CAN, COL, ECU, PAN y USA.
 EXEC Reportes.usp_ReportarMatrizPrimeTime @HoraDesde = 12, @HoraHasta = 14;
 GO
@@ -89,7 +90,7 @@ EXEC Reportes.usp_ReportarPlantillas;
 GO
 
 PRINT '=== Paso 8: resultados de los encuentros ===';
--- Resultado esperado: dos resultados. La tabla de posiciones de las 25 selecciones, por grupo, y la lista de los 46
+-- Resultado esperado: dos resultados. La tabla de posiciones de las 25 selecciones, por grupo, y la lista de los 47
 -- partidos con resultado, penales, ganador y goleadores.
 EXEC Reportes.usp_ReportarResultados;
 GO
