@@ -3,9 +3,9 @@
 Trabajo práctico de Bases de Datos Aplicada (3641, UNLaM) — Sistema de registro y gestión del Mundial de Fútbol, en SQL Server.
 Grupo N° 4, comisión 02-5600.
 
-- `sql/`: scripts T-SQL de las Entregas 5 a 7, numerados con dos dígitos que indican el orden de ejecución.
+- `sql/`: scripts T-SQL de las Entregas 5 a 8, numerados con dos dígitos que indican el orden de ejecución.
 - `MundialDB.ssmssln`: solución de SSMS con los scripts en ese orden.
-- `doc/`: documentación de las entregas (DER, instalación y Entregas 5 a 7 en PDF).
+- `doc/`: documentación de las entregas (DER, instalación y Entregas 5 a 8 en PDF).
 
 ## Cómo ejecutarlo
 
@@ -24,7 +24,7 @@ curl -f -L -o C:\Importar\dossier.html https://dossiermundial.netlify.app/
    El script 07 activa `Ole Automation Procedures` y requiere un usuario sysadmin.
 
 El script 01 elimina y vuelve a crear `MundialDB`. Para empezar de nuevo basta con ejecutar otra vez desde el 01.
-Los scripts `99_Datos_Aceptacion.sql` y `99_Demo_Reportes.sql` van al final y en ese orden.
+Los scripts `99_Datos_Aceptacion.sql`, `99_Demo_Reportes.sql` y `99_Seguridad_1` a `99_Seguridad_7` van al final y en ese orden. Los de seguridad (Entrega 8) cifran los datos personales y crean los roles; sus tests muestran los permisos de cada usuario.
 Requiere SQL Server 2022 o posterior; probado en SQL Server 2025 Express.
 
 ## Integrantes
