@@ -211,6 +211,24 @@
         <FileNode Name="99_Seguridad_7_Test_Consulta.sql">
           <FullPath>99_Seguridad_7_Test_Consulta.sql</FullPath>
         </FileNode>
+        <FileNode Name="99_Visualizacion_1_Geolocalizacion_Sedes.sql">
+          <FullPath>99_Visualizacion_1_Geolocalizacion_Sedes.sql</FullPath>
+        </FileNode>
+        <FileNode Name="99_Visualizacion_2_Consultas_Alcance.sql">
+          <FullPath>99_Visualizacion_2_Consultas_Alcance.sql</FullPath>
+        </FileNode>
+        <FileNode Name="99_Visualizacion_3_Vistas_BI.sql">
+          <FullPath>99_Visualizacion_3_Vistas_BI.sql</FullPath>
+        </FileNode>
+        <FileNode Name="99_Visualizacion_4_Acceso_BI.sql">
+          <FullPath>99_Visualizacion_4_Acceso_BI.sql</FullPath>
+        </FileNode>
+        <FileNode Name="99_Visualizacion_5_Test_Consultas_Alcance.sql">
+          <FullPath>99_Visualizacion_5_Test_Consultas_Alcance.sql</FullPath>
+        </FileNode>
+        <FileNode Name="99_Visualizacion_6_Test_BI.sql">
+          <FullPath>99_Visualizacion_6_Test_BI.sql</FullPath>
+        </FileNode>
       </Items>
     </LogicalFolder>
     <LogicalFolder Name="Miscellaneous" Type="3" />
