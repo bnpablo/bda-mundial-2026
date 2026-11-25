@@ -190,6 +190,27 @@
         <FileNode Name="99_Demo_Reportes.sql">
           <FullPath>99_Demo_Reportes.sql</FullPath>
         </FileNode>
+        <FileNode Name="99_Seguridad_1_Cifrado_Base.sql">
+          <FullPath>99_Seguridad_1_Cifrado_Base.sql</FullPath>
+        </FileNode>
+        <FileNode Name="99_Seguridad_2_Cifrado_Torneo.sql">
+          <FullPath>99_Seguridad_2_Cifrado_Torneo.sql</FullPath>
+        </FileNode>
+        <FileNode Name="99_Seguridad_3_Cifrado_Arbitraje.sql">
+          <FullPath>99_Seguridad_3_Cifrado_Arbitraje.sql</FullPath>
+        </FileNode>
+        <FileNode Name="99_Seguridad_4_Roles.sql">
+          <FullPath>99_Seguridad_4_Roles.sql</FullPath>
+        </FileNode>
+        <FileNode Name="99_Seguridad_5_Test_Administrador.sql">
+          <FullPath>99_Seguridad_5_Test_Administrador.sql</FullPath>
+        </FileNode>
+        <FileNode Name="99_Seguridad_6_Test_Cargador.sql">
+          <FullPath>99_Seguridad_6_Test_Cargador.sql</FullPath>
+        </FileNode>
+        <FileNode Name="99_Seguridad_7_Test_Consulta.sql">
+          <FullPath>99_Seguridad_7_Test_Consulta.sql</FullPath>
+        </FileNode>
       </Items>
     </LogicalFolder>
     <LogicalFolder Name="Miscellaneous" Type="3" />
